@@ -180,21 +180,34 @@ async def seed():
 
 async def ensure_halls():
     """Ensure all 5 halls exist, even if DB was seeded with old code."""
+    print("DEBUG: [ensure_halls] Checking halls in DB...")
     async with AsyncSessionLocal() as db:
-        result = await db.execute(select(Hall))
-        existing = {h.name for h in result.scalars().all()}
-        created = False
-        for name, desc, price in DEMO_HALLS:
-            if name not in existing:
-                h = Hall(name=name, description=desc, default_price=price)
-                db.add(h)
-                await db.flush()
-                for av in make_availability(h.id):
-                    db.add(av)
-                created = True
-        if created:
-            await db.commit()
-            print("ensure_halls: created missing halls")
+        try:
+            result = await db.execute(select(Hall))
+            existing_halls = result.scalars().all()
+            existing_names = {h.name for h in existing_halls}
+            print(f"DEBUG: [ensure_halls] Found {len(existing_names)} existing halls: {existing_names}")
+            
+            created = False
+            for name, desc, price in DEMO_HALLS:
+                if name not in existing_names:
+                    print(f"DEBUG: [ensure_halls] Creating missing hall: {name}")
+                    h = Hall(name=name, description=desc, default_price=price)
+                    db.add(h)
+                    await db.flush()
+                    print(f"DEBUG: [ensure_halls] Hall {name} created with ID {h.id}, adding availability...")
+                    for av in make_availability(h.id):
+                        db.add(av)
+                    created = True
+            
+            if created:
+                await db.commit()
+                print("DEBUG: [ensure_halls] Changes committed successfully")
+            else:
+                print("DEBUG: [ensure_halls] No halls were missing, nothing to do")
+        except Exception as e:
+            print(f"DEBUG: [ensure_halls] ERROR: {e}")
+            raise e
 
 
 if __name__ == "__main__":

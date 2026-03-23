@@ -22,11 +22,38 @@ const HALL_ICONS: Record<string, string> = {
 
 export default function Halls() {
   const [halls, setHalls] = useState<Hall[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
 
   useEffect(() => {
-    settings.halls().then((r) => setHalls(r.data))
+    setLoading(true)
+    settings.halls()
+      .then((r) => {
+        setHalls(r.data)
+        setLoading(false)
+      })
+      .catch((err) => {
+        console.error('Failed to fetch halls:', err)
+        setError(err.message || 'Ошибка загрузки данных')
+        setLoading(false)
+      })
   }, [])
+
+  if (loading) return <div className="p-8 text-center text-slate-500 animate-pulse">Загрузка залов...</div>
+  
+  if (error) return (
+    <div className="p-8 text-center text-red-500 bg-red-50 rounded-xl border border-red-100">
+      <p className="font-semibold">Ошибка подключения к серверу</p>
+      <p className="text-sm opacity-80">{error}</p>
+      <button 
+        onClick={() => window.location.reload()}
+        className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700"
+      >
+        Попробовать еще раз
+      </button>
+    </div>
+  )
 
   return (
     <div className="space-y-6">

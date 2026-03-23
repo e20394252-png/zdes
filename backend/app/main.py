@@ -10,24 +10,47 @@ settings = get_settings()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    print("DEBUG: Application starting up...")
     # Create tables if not exist
     async with engine.begin() as conn:
+        print("DEBUG: Running migrations/table creation...")
         await conn.run_sync(Base.metadata.create_all)
+        print("DEBUG: Migrations/table creation finished")
+        
     # Seed default funnel and admin if empty
     try:
         from app.seed import seed
+        print("DEBUG: Starting seed()...")
         await seed()
+        print("DEBUG: seed() finished")
     except Exception as e:
         import logging
-        logging.getLogger("uvicorn.error").warning("Initial seed skipped or failed: %s", e)
+        logging.getLogger("uvicorn.error").warning("Initial seed failed: %s", e)
+        print(f"DEBUG: seed() Exception: {e}")
     
     try:
         from app.seed import ensure_halls
+        print("DEBUG: Starting ensure_halls()...")
         await ensure_halls()
+        print("DEBUG: ensure_halls() finished")
     except Exception as e:
         import logging
         logging.getLogger("uvicorn.error").error("ensure_halls failed: %s", e)
+        print(f"DEBUG: ensure_halls() Exception: {e}")
+    
+    # Check current hall count
+    try:
+        from app.database import AsyncSessionLocal
+        from app.models.hall import Hall
+        from sqlalchemy import select, func
+        async with AsyncSessionLocal() as db:
+            count = (await db.execute(select(func.count()).select_from(Hall))).scalar()
+            print(f"DEBUG: Current hall count in DB: {count}")
+    except Exception as e:
+        print(f"DEBUG: Failed to check hall count: {e}")
+        
     yield
+    print("DEBUG: Application shutting down...")
     await engine.dispose()
 
 
