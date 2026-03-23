@@ -69,15 +69,17 @@ app.add_middleware(
         "https://event-crm-frontend.onrender.com",
         "http://localhost:5173",
         "http://localhost:4173",
-        "*"
     ],
-    allow_credentials=False,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.include_router(api)
-
+app.include_router(api, prefix="/api")
 
 @app.get("/health")
 async def health():
     return {"status": "ok"}
+
+@app.get("/api/test")
+async def api_test():
+    return {"status": "ok", "message": "API is reachable"}
