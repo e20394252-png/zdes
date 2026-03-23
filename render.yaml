@@ -1,13 +1,12 @@
-services:
-  # Database
-  - type: database
-    name: event-crm-db
+databases:
+  - name: event-crm-db
     databaseName: event_crm
     user: crm_user
     plan: free
 
-  # Redis
-  - type: redis
+services:
+  # Redis (Managed Key-Value)
+  - type: keyvalue
     name: event-crm-redis
     plan: free
     ipAllowList: [] # Only allow internal connections
@@ -15,7 +14,7 @@ services:
   # Backend Web Service
   - type: web
     name: event-crm-backend
-    env: python
+    runtime: python
     plan: free
     region: frankfurt
     rootDir: backend
@@ -27,8 +26,9 @@ services:
           name: event-crm-db
           property: connectionString
       - key: REDIS_URL
-        fromRedis:
+        fromService:
           name: event-crm-redis
+          type: keyvalue
           property: connectionString
       - key: SECRET_KEY
         generateValue: true
@@ -40,14 +40,14 @@ services:
         sync: false
 
   # Frontend Static Site
-  - type: static
+  - type: web
     name: event-crm-frontend
-    env: static
+    runtime: static
     plan: free
     region: frankfurt
     rootDir: frontend
     buildCommand: npm install && npm run build
-    publishDir: dist
+    staticPublishPath: ./dist
     envVars:
       - key: VITE_API_URL
         fromService:
