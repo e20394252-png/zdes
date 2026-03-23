@@ -60,23 +60,79 @@ export default function Halls() {
 
   if (loading) return <div className="p-8 text-center text-slate-500 animate-pulse">Загрузка залов...</div>
   
+  const [manualUrl, setManualUrl] = useState('')
+
   if (error) return (
-    <div className="p-8 text-center text-red-500 bg-red-50 rounded-xl border border-red-100">
-      <p className="font-semibold text-lg mb-2">Ошибка подключения к серверу</p>
-      <p className="text-sm opacity-80 mb-4">{error}</p>
+    <div className="p-8 text-center text-red-500 bg-red-50 rounded-xl border border-red-100 max-w-2xl mx-auto shadow-sm">
+      <p className="font-semibold text-xl mb-2 text-red-700">Ошибка подключения к серверу</p>
+      <p className="text-sm opacity-80 mb-6 font-medium">{error}</p>
       
-      <div className="max-w-md mx-auto p-4 bg-white/80 rounded-xl border border-red-100 text-xs font-mono text-left space-y-2 text-slate-600 shadow-inner">
-        <div><span className="text-slate-400">Raw VITE_API_URL:</span> {RAW_VITE_URL || '(empty)'}</div>
-        <div><span className="text-slate-400">Final API_BASE:</span> {api.defaults.baseURL}</div>
-        <div><span className="text-slate-400">Note:</span> {api.defaults.baseURL?.includes('.onrender.com') ? 'Public URL' : 'Relative/Internal URL'}</div>
+      <div className="bg-white/90 p-6 rounded-2xl border border-red-100 text-left space-y-4 shadow-inner mb-6">
+        <h4 className="text-slate-800 font-semibold flex items-center gap-2">
+          <span className="text-lg">🛠️</span> Расширенная диагностика
+        </h4>
+        <div className="grid grid-cols-1 gap-2 text-[11px] font-mono text-slate-500">
+          <div className="flex justify-between border-b border-slate-100 pb-1">
+            <span>Raw VITE_API_URL (Blueprint):</span>
+            <span className="text-slate-700 font-bold">{RAW_VITE_URL || '(empty)'}</span>
+          </div>
+          <div className="flex justify-between border-b border-slate-100 pb-1">
+            <span>Final API_BASE:</span>
+            <span className="text-slate-700 font-bold">{api.defaults.baseURL}</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Timeout Setting:</span>
+            <span className="text-slate-700 font-bold">{api.defaults.timeout}ms</span>
+          </div>
+        </div>
+
+        <div className="pt-4 border-t border-slate-100">
+          <p className="text-xs text-slate-600 mb-2 font-medium">Введите адрес бэкенда вручную (из Dashboard Render):</p>
+          <div className="flex gap-2">
+            <input 
+              type="text" 
+              placeholder="https://event-crm-backend-xxxx.onrender.com"
+              value={manualUrl}
+              onChange={(e) => setManualUrl(e.target.value)}
+              className="flex-1 px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 outline-none text-slate-800"
+            />
+            <button 
+              onClick={() => {
+                let url = manualUrl.trim()
+                if (!url) return
+                if (!url.startsWith('http')) url = 'https://' + url
+                if (!url.endsWith('/api')) url = url.replace(/\/$/, '') + '/api'
+                localStorage.setItem('VITE_API_URL_OVERRIDE', url)
+                window.location.reload()
+              }}
+              className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-xs font-semibold hover:bg-indigo-700 shadow-sm"
+            >
+              Сохранить и обновить
+            </button>
+          </div>
+          <p className="text-[10px] text-slate-400 mt-2 italic">Например: https://event-crm-backend.onrender.com</p>
+        </div>
       </div>
 
-      <button 
-        onClick={() => window.location.reload()}
-        className="mt-6 px-6 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 shadow-sm transition-all"
-      >
-        Попробовать еще раз
-      </button>
+      <div className="flex justify-center gap-4">
+        <button 
+          onClick={() => window.location.reload()}
+          className="px-6 py-2.5 bg-red-600 text-white rounded-xl text-sm font-semibold hover:bg-red-700 shadow-md transition-all active:scale-95"
+        >
+          Попробовать еще раз
+        </button>
+        {localStorage.getItem('VITE_API_URL_OVERRIDE') && (
+          <button 
+            onClick={() => {
+              localStorage.removeItem('VITE_API_URL_OVERRIDE')
+              window.location.reload()
+            }}
+            className="px-4 py-2.5 bg-slate-200 text-slate-600 rounded-xl text-sm font-semibold hover:bg-slate-300 transition-all"
+          >
+            Сбросить адрес
+          </button>
+        )}
+      </div>
     </div>
   )
 

@@ -4,7 +4,12 @@ export const RAW_VITE_URL = (import.meta as any).env.VITE_API_URL
 const VITE_API_URL = RAW_VITE_URL
 let API_BASE = '/api'
 
-if (VITE_API_URL) {
+// Check for manual override in localStorage
+const OVERRIDE = typeof window !== 'undefined' ? localStorage.getItem('VITE_API_URL_OVERRIDE') : null
+
+if (OVERRIDE) {
+  API_BASE = OVERRIDE
+} else if (VITE_API_URL) {
   let host = VITE_API_URL
   if (!host.includes('.') && !host.includes('localhost') && !host.startsWith('http')) {
     host += '.onrender.com'
