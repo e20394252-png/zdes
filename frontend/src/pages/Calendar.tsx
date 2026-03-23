@@ -95,14 +95,20 @@ export default function Calendar() {
     })
   }
 
-  function openBooking(dateStr: string) {
+  function openBooking(dateStr: string, startTime?: string, hId?: number | null) {
+    let endTime = ''
+    if (startTime) {
+      const [h, m] = startTime.split(':').map(Number)
+      endTime = `${(h + 1).toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`
+    }
+
     setBookForm({
       title: '',
       contact_id: null,
-      hall_id: null,
+      hall_id: hId !== undefined ? hId : selectedHall,
       event_date: dateStr,
-      event_time_start: '',
-      event_time_end: '',
+      event_time_start: startTime || '',
+      event_time_end: endTime,
       rental_price: 0,
       participants_count: null,
       comments: '',
@@ -233,10 +239,17 @@ export default function Calendar() {
             <div className="p-5 space-y-1">
               {timeSlots.map((t) => {
                 const busy = getBusySlots(t)
+                const isBusy = busy.length > 0
                 return (
-                  <div key={t} className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm">
-                    <span className="font-mono w-12 shrink-0">{t}</span>
-                    {busy.length > 0 ? (
+                  <div 
+                    key={t} 
+                    onClick={() => !isBusy && openBooking(selectedDay!, t)}
+                    className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
+                      !isBusy ? 'hover:bg-primary-50 cursor-pointer group' : ''
+                    }`}
+                  >
+                    <span className="font-mono w-12 shrink-0 text-slate-500">{t}</span>
+                    {isBusy ? (
                       <div className="flex flex-wrap gap-1">
                         {busy.map((s, i) => {
                           const c = getHallColor(s.hall_name)
@@ -248,7 +261,10 @@ export default function Calendar() {
                         })}
                       </div>
                     ) : (
-                      <span className="text-slate-400">свободно</span>
+                      <div className="flex items-center justify-between flex-1">
+                        <span className="text-slate-400 group-hover:text-primary-600">свободно</span>
+                        <span className="text-primary-600 opacity-0 group-hover:opacity-100 text-xs font-medium">+ Забронировать</span>
+                      </div>
                     )}
                   </div>
                 )

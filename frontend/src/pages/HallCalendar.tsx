@@ -105,15 +105,21 @@ export default function HallCalendar() {
     })
   }
 
-  function openBooking(dateStr: string) {
+  function openBooking(dateStr: string, startTime?: string) {
+    let endTime = ''
+    if (startTime) {
+      const [h, m] = startTime.split(':').map(Number)
+      endTime = `${(h + 1).toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`
+    }
+
     setBookForm((f) => ({
       ...f,
       event_date: dateStr,
       hall_id: hallId,
       title: '',
       contact_id: null,
-      event_time_start: '',
-      event_time_end: '',
+      event_time_start: startTime || '',
+      event_time_end: endTime,
       comments: '',
       participants_count: null,
     }))
@@ -241,14 +247,22 @@ export default function HallCalendar() {
               {timeSlots.map((t) => {
                 const busy = isSlotBusy(t)
                 return (
-                  <div key={t} className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm ${busy ? '' : 'text-slate-500'}`}
+                  <div 
+                    key={t} 
+                    onClick={() => !busy && openBooking(selectedDay!, t)}
+                    className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
+                      !busy ? 'hover:bg-slate-50 cursor-pointer group' : ''
+                    }`}
                     style={busy ? { backgroundColor: color + '15', borderLeft: `3px solid ${color}` } : {}}
                   >
-                    <span className="font-mono w-12 shrink-0">{t}</span>
+                    <span className="font-mono w-12 shrink-0 text-slate-500">{t}</span>
                     {busy ? (
                       <span className="font-medium" style={{ color }}>{busy.deal_title || 'Бронь'} ({busy.time_start.slice(0, 5)}–{busy.time_end.slice(0, 5)})</span>
                     ) : (
-                      <span>свободно</span>
+                      <div className="flex items-center justify-between flex-1">
+                        <span className="text-slate-400 group-hover:text-primary-600">свободно</span>
+                        <span className="text-primary-600 opacity-0 group-hover:opacity-100 text-xs font-medium">+ Забронировать</span>
+                      </div>
                     )}
                   </div>
                 )

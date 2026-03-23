@@ -15,12 +15,18 @@ async def lifespan(app: FastAPI):
         await conn.run_sync(Base.metadata.create_all)
     # Seed default funnel and admin if empty
     try:
-        from app.seed import seed, ensure_halls
+        from app.seed import seed
         await seed()
+    except Exception as e:
+        import logging
+        logging.getLogger("uvicorn.error").warning("Initial seed skipped or failed: %s", e)
+    
+    try:
+        from app.seed import ensure_halls
         await ensure_halls()
     except Exception as e:
         import logging
-        logging.getLogger("uvicorn.error").warning("Seed failed: %s", e)
+        logging.getLogger("uvicorn.error").error("ensure_halls failed: %s", e)
     yield
     await engine.dispose()
 
