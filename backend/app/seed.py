@@ -178,5 +178,24 @@ async def seed():
     print("Seed: test users and demo data created. See DEPLOY_WINDOWS.md for credentials.")
 
 
+async def ensure_halls():
+    """Ensure all 5 halls exist, even if DB was seeded with old code."""
+    async with AsyncSessionLocal() as db:
+        result = await db.execute(select(Hall))
+        existing = {h.name for h in result.scalars().all()}
+        created = False
+        for name, desc, price in DEMO_HALLS:
+            if name not in existing:
+                h = Hall(name=name, description=desc, default_price=price)
+                db.add(h)
+                await db.flush()
+                for av in make_availability(h.id):
+                    db.add(av)
+                created = True
+        if created:
+            await db.commit()
+            print("ensure_halls: created missing halls")
+
+
 if __name__ == "__main__":
     asyncio.run(seed())

@@ -37,7 +37,7 @@ export default function DealCard() {
   const [funnels, setFunnels] = useState<{ id: number; stages: Stage[] }[]>([])
   const [saving, setSaving] = useState(false)
   const [showNewClient, setShowNewClient] = useState(false)
-  const [newClient, setNewClient] = useState({ name: '', phone: '', email: '' })
+  const [newClient, setNewClient] = useState({ name: '', phone: '', telegram_username: '' })
   const [form, setForm] = useState({
     title: '',
     contact_id: null as number | null,
@@ -169,14 +169,14 @@ export default function DealCard() {
                 <div className="space-y-2 p-3 bg-slate-50 rounded-lg border border-slate-200">
                   <input placeholder="Имя *" value={newClient.name} onChange={(e) => setNewClient((c) => ({ ...c, name: e.target.value }))} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
                   <input placeholder="Телефон" value={newClient.phone} onChange={(e) => setNewClient((c) => ({ ...c, phone: e.target.value }))} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
-                  <input placeholder="Email" value={newClient.email} onChange={(e) => setNewClient((c) => ({ ...c, email: e.target.value }))} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
+                  <input placeholder="Telegram" value={newClient.telegram_username} onChange={(e) => setNewClient((c) => ({ ...c, telegram_username: e.target.value }))} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
                   <button type="button" onClick={async () => {
                     if (!newClient.name) return
                     try {
                       const { data } = await contacts.create(newClient)
                       setContactsList((prev) => [data, ...prev])
                       setForm((f) => ({ ...f, contact_id: data.id }))
-                      setNewClient({ name: '', phone: '', email: '' })
+                      setNewClient({ name: '', phone: '', telegram_username: '' })
                       setShowNewClient(false)
                     } catch (_) {}
                   }} className="px-3 py-1.5 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-500">Добавить</button>
