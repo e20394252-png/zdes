@@ -64,6 +64,9 @@ export default function Halls() {
     <div className="p-8 text-center text-red-500 bg-red-50 rounded-xl border border-red-100">
       <p className="font-semibold">Ошибка подключения к серверу</p>
       <p className="text-sm opacity-80">{error}</p>
+      <div className="mt-4 p-3 bg-white/50 rounded border border-red-100 text-xs font-mono break-all text-slate-500">
+        Попытка подключения к: {api.defaults.baseURL}
+      </div>
       <button 
         onClick={() => window.location.reload()}
         className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700"
