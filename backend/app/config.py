@@ -20,15 +20,26 @@ class Settings(BaseSettings):
 
     @property
     def sqlalchemy_database_url(self) -> str:
-        # Render provides postgres://, but asyncpg needs postgresql+asyncpg://
         url = self.DATABASE_URL
-        # print first 15 chars for debugging
-        import logging
-        logging.getLogger("uvicorn.error").info(f"Connecting to DB with prefix: {url[:15]}...")
+        # Aggressive debug print for Render logs
+        import os
+        print(f"DEBUG: DATABASE_URL env exists: {'DATABASE_URL' in os.environ}", flush=True)
+        print(f"DEBUG: Using URL prefix: {url[:20]}...", flush=True)
+        
+        # Render provides postgres:// or postgresql://, but asyncpg needs postgresql+asyncpg://
         if url.startswith("postgres://"):
             url = url.replace("postgres://", "postgresql+asyncpg://", 1)
         elif url.startswith("postgresql://") and "asyncpg" not in url:
             url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+        
+        # If it's still 'db' (the default), and we are on Render, something is wrong
+        if "@db:" in url and os.environ.get("RENDER"):
+            print("WARNING: Using default 'db' hostname on Render! Trying to find RENDER_POSTGRES_INTERNAL_URL...", flush=True)
+            render_url = os.environ.get("RENDER_POSTGRES_INTERNAL_URL")
+            if render_url:
+                url = render_url.replace("postgres://", "postgresql+asyncpg://", 1)
+                print("DEBUG: Switched to RENDER_POSTGRES_INTERNAL_URL", flush=True)
+
         return url
 
     # Auth
