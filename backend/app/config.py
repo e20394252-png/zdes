@@ -1,5 +1,13 @@
+import os
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from functools import lru_cache
+
+# TOP-LEVEL DEBUG PRINT FOR RENDER
+print("--- STARTING CONFIG IMPORT ---", flush=True)
+for k, v in os.environ.items():
+    if any(x in k for x in ["DATABASE", "POSTGRES", "URL", "REDIS"]):
+        print(f"DEBUG ENV: {k} = {v[:15]}...", flush=True)
+print("--- END CONFIG IMPORT ---", flush=True)
 
 
 class Settings(BaseSettings):
@@ -20,13 +28,13 @@ class Settings(BaseSettings):
 
     @property
     def sqlalchemy_database_url(self) -> str:
-        url = self.DATABASE_URL
-        # Aggressive debug print for Render logs
-        import os
-        print(f"DEBUG: DATABASE_URL env exists: {'DATABASE_URL' in os.environ}", flush=True)
-        print(f"DEBUG: Using URL prefix: {url[:20]}...", flush=True)
+        # Priority 1: Direct OS env (bypassing Pydantic if needed)
+        url = os.getenv("DATABASE_URL") or self.DATABASE_URL
         
-        # Render provides postgres:// or postgresql://, but asyncpg needs postgresql+asyncpg://
+        # Aggressive debug print
+        print(f"DEBUG: Final URL prefix used: {url[:20]}...", flush=True)
+        
+        # Render provides postgres://, but asyncpg needs postgresql+asyncpg://
         if url.startswith("postgres://"):
             url = url.replace("postgres://", "postgresql+asyncpg://", 1)
         elif url.startswith("postgresql://") and "asyncpg" not in url:
