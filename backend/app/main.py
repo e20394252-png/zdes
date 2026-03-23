@@ -1,9 +1,11 @@
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from app.api import api
 from app.config import get_settings
 from app.database import engine, Base
+from app.models.user import User
+from app.core.deps import require_user
 
 settings = get_settings()
 
@@ -83,3 +85,7 @@ async def health():
 @app.get("/api/test")
 async def api_test():
     return {"status": "ok", "message": "API is reachable"}
+
+@app.get("/api/test-auth")
+async def api_test_auth(user: User = Depends(require_user)):
+    return {"status": "ok", "message": f"Auth works! User: {user.email}"}
