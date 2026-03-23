@@ -4,23 +4,35 @@ export const RAW_VITE_URL = (import.meta as any).env.VITE_API_URL
 const VITE_API_URL = RAW_VITE_URL
 let API_BASE = '/api'
 
-// Check for manual override in localStorage
-const OVERRIDE = typeof window !== 'undefined' ? localStorage.getItem('VITE_API_URL_OVERRIDE') : null
+// Logic to determine API_BASE
+function determineBase() {
+  const override = typeof window !== 'undefined' ? localStorage.getItem('VITE_API_URL_OVERRIDE') : null
+  if (override) {
+    let host = override.trim()
+    if (!host.startsWith('http')) host = `https://${host}`
+    // If it doesn't end with /api, append it
+    if (!host.endsWith('/api') && !host.endsWith('/api/')) {
+      host = host.endsWith('/') ? `${host}api` : `${host}/api`
+    }
+    return host
+  }
 
-if (OVERRIDE) {
-  API_BASE = OVERRIDE
-} else if (VITE_API_URL) {
-  let host = VITE_API_URL
-  if (!host.includes('.') && !host.includes('localhost') && !host.startsWith('http')) {
-    host += '.onrender.com'
+  if (VITE_API_URL) {
+    let host = VITE_API_URL.trim()
+    if (!host.includes('.') && !host.includes('localhost') && !host.startsWith('http')) {
+      host += '.onrender.com'
+    }
+    
+    if (host.startsWith('http')) {
+      return host.endsWith('/') ? `${host}api` : `${host}/api`
+    } else {
+      return `https://${host}/api`
+    }
   }
-  
-  if (host.startsWith('http')) {
-    API_BASE = host.endsWith('/') ? `${host}api` : `${host}/api`
-  } else {
-    API_BASE = `https://${host}/api`
-  }
+  return '/api'
 }
+
+const API_BASE = determineBase()
 
 export const api = axios.create({
   baseURL: API_BASE,

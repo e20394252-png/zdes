@@ -77,7 +77,17 @@ export default function Halls() {
           </div>
           <div className="flex justify-between border-b border-slate-100 pb-1">
             <span>Final API_BASE:</span>
-            <span className="text-slate-700 font-bold">{api.defaults.baseURL}</span>
+            <div className="text-right">
+              <div className="text-slate-700 font-bold">{api.defaults.baseURL}</div>
+              <a 
+                href={`${api.defaults.baseURL?.replace(/\/api\/?$/, '')}/health`} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-[10px] text-blue-600 underline block mt-0.5"
+              >
+                Проверить /health (откроется в новой вкладке)
+              </a>
+            </div>
           </div>
           <div className="flex justify-between">
             <span>Timeout Setting:</span>
