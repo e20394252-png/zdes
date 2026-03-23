@@ -48,11 +48,6 @@ class Settings(BaseSettings):
     # OpenAI for message parsing (optional)
     OPENAI_API_KEY: str = ""
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-        extra = "ignore"
-
 
 @lru_cache
 def get_settings() -> Settings:
