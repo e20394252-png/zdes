@@ -22,6 +22,9 @@ class Settings(BaseSettings):
     def sqlalchemy_database_url(self) -> str:
         # Render provides postgres://, but asyncpg needs postgresql+asyncpg://
         url = self.DATABASE_URL
+        # print first 15 chars for debugging
+        import logging
+        logging.getLogger("uvicorn.error").info(f"Connecting to DB with prefix: {url[:15]}...")
         if url.startswith("postgres://"):
             url = url.replace("postgres://", "postgresql+asyncpg://", 1)
         elif url.startswith("postgresql://") and "asyncpg" not in url:
