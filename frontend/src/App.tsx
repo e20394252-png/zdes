@@ -10,6 +10,8 @@ import HallCalendar from './pages/HallCalendar'
 import Calendar from './pages/Calendar'
 import Settings from './pages/Settings'
 
+import ErrorBoundary from './components/ErrorBoundary'
+
 function Protected() {
   return (
     <Layout>
@@ -20,7 +22,8 @@ function Protected() {
 
 export default function App() {
   return (
-    <Routes>
+    <ErrorBoundary>
+      <Routes>
       <Route path="/login" element={<Navigate to="/" replace />} />
       <Route path="/" element={<Protected />}>
         <Route index element={<Dashboard />} />
@@ -35,5 +38,6 @@ export default function App() {
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    </ErrorBoundary>
   )
 }
