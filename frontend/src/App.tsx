@@ -11,8 +11,6 @@ import Calendar from './pages/Calendar'
 import Settings from './pages/Settings'
 
 function Protected() {
-  const { token } = useAuth()
-  if (!token) return <Navigate to="/login" replace />
   return (
     <Layout>
       <Outlet />
@@ -23,7 +21,7 @@ function Protected() {
 export default function App() {
   return (
     <Routes>
-      <Route path="/login" element={<Login />} />
+      <Route path="/login" element={<Navigate to="/" replace />} />
       <Route path="/" element={<Protected />}>
         <Route index element={<Dashboard />} />
         <Route path="deals" element={<Deals />} />
