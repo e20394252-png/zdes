@@ -16,7 +16,7 @@ export default function Login() {
     setError('')
     setLoading(true)
     try {
-      const { data } = await auth.login(email, password)
+      const data = await auth.login(email, password)
       setToken(data.access_token)
       navigate('/')
     } catch (err: unknown) {

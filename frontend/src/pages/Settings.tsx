@@ -28,23 +28,23 @@ export default function Settings() {
   })
 
   useEffect(() => {
-    settings.funnels().then((r) => setFunnels(r.data))
-    settings.halls().then((r) => setHalls(r.data))
-    settings.managers().then((r) => setManagers(r.data))
+    settings.funnels().then((r) => setFunnels(r))
+    settings.halls().then((r) => setHalls(r))
+    settings.managers().then((r) => setManagers(r))
     settings.telethon().then((r) => {
-      setTelethonCfg(r.data)
+      setTelethonCfg(r)
       setTelethonForm({
-        chat_id: r.data.chat_id || '',
-        keywords: r.data.keywords || '',
-        use_ai_context: r.data.use_ai_context || false,
-        ai_prompt: r.data.ai_prompt || '',
+        chat_id: r.chat_id || '',
+        keywords: r.keywords || '',
+        use_ai_context: r.use_ai_context || false,
+        ai_prompt: r.ai_prompt || '',
       })
     })
   }, [])
 
   async function handleTelethonQr() {
     try {
-      const { data } = await telethon.qr()
+      const data = await telethon.qr()
       setQrUrl(data.url)
       // User scans QR in Telegram, then clicks "Authorized" to confirm
     } catch (e) {
@@ -56,7 +56,7 @@ export default function Settings() {
     await telethon.authorize()
     setQrUrl(null)
     const r = await settings.telethon()
-    setTelethonCfg(r.data)
+    setTelethonCfg(r)
   }
 
   async function handleTelethonSave() {
@@ -67,7 +67,7 @@ export default function Settings() {
       ai_prompt: telethonForm.ai_prompt || null,
     })
     const r = await settings.telethon()
-    setTelethonCfg(r.data)
+    setTelethonCfg(r)
   }
 
   const tabs = [
