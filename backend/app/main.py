@@ -78,6 +78,11 @@ app.add_middleware(
 )
 app.include_router(api, prefix="/api")
 
+# --- Explicit Preflight Handlers ---
+@app.options("/{full_path:path}")
+async def preflight_handler(full_path: str):
+    return {}
+
 @app.get("/health")
 async def health():
     return {"status": "ok"}
