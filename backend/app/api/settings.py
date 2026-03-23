@@ -155,5 +155,17 @@ async def update_telethon_config(data: TelethonConfigUpdate, db: AsyncSession = 
     for k, v in data.model_dump(exclude_unset=True).items():
         setattr(cfg, k, v)
     await db.flush()
-    await db.refresh(cfg)
-    return {"ok": True}
+@router.get("/seed-halls")
+@router.post("/seed-halls")
+async def seed_halls_manual(db: AsyncSession = Depends(get_db)):
+    from app.seed import ensure_halls
+    print("DEBUG: Manual seed-halls triggered")
+    await ensure_halls()
+    return {"status": "ok", "message": "Halls ensured"}
+
+
+@router.get("/halls/count")
+async def get_halls_count(db: AsyncSession = Depends(get_db)):
+    from sqlalchemy import func
+    count = (await db.execute(select(func.count()).select_from(Hall))).scalar()
+    return {"count": count}
