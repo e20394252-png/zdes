@@ -2,13 +2,6 @@ import os
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from functools import lru_cache
 
-# TOP-LEVEL DEBUG PRINT FOR RENDER
-print("--- STARTING CONFIG IMPORT ---", flush=True)
-for k, v in os.environ.items():
-    if any(x in k for x in ["DATABASE", "POSTGRES", "URL", "REDIS"]):
-        print(f"DEBUG ENV: {k} = {v[:15]}...", flush=True)
-print("--- END CONFIG IMPORT ---", flush=True)
-
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
@@ -31,22 +24,17 @@ class Settings(BaseSettings):
         # Priority 1: Direct OS env (bypassing Pydantic if needed)
         url = os.getenv("DATABASE_URL") or self.DATABASE_URL
         
-        # Aggressive debug print
-        print(f"DEBUG: Final URL prefix used: {url[:20]}...", flush=True)
-        
         # Render provides postgres://, but asyncpg needs postgresql+asyncpg://
         if url.startswith("postgres://"):
             url = url.replace("postgres://", "postgresql+asyncpg://", 1)
         elif url.startswith("postgresql://") and "asyncpg" not in url:
             url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
         
-        # If it's still 'db' (the default), and we are on Render, something is wrong
+        # Fallback for Render specifically
         if "@db:" in url and os.environ.get("RENDER"):
-            print("WARNING: Using default 'db' hostname on Render! Trying to find RENDER_POSTGRES_INTERNAL_URL...", flush=True)
             render_url = os.environ.get("RENDER_POSTGRES_INTERNAL_URL")
             if render_url:
                 url = render_url.replace("postgres://", "postgresql+asyncpg://", 1)
-                print("DEBUG: Switched to RENDER_POSTGRES_INTERNAL_URL", flush=True)
 
         return url
 
