@@ -24,6 +24,7 @@ export default function Halls() {
   const [halls, setHalls] = useState<Hall[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [errorDetails, setErrorDetails] = useState<any>(null)
   const [manualUrl, setManualUrl] = useState('')
   const navigate = useNavigate()
 
@@ -33,14 +34,21 @@ export default function Halls() {
 
   const loadHalls = () => {
     setLoading(true)
+    setError(null)
+    setErrorDetails(null)
     settings.halls()
-      .then((r) => {
-        setHalls(r.data)
+      .then((data) => {
+        setHalls(data)
         setLoading(false)
       })
       .catch((err) => {
         console.error('Failed to fetch halls:', err)
         setError(err.message || 'Ошибка загрузки данных')
+        setErrorDetails({
+          code: err.code,
+          status: err.response?.status,
+          data: err.response?.data
+        })
         setLoading(false)
       })
   }
@@ -49,8 +57,8 @@ export default function Halls() {
     try {
       setLoading(true)
       await api.get('/settings/seed-halls')
-      const r = await settings.halls()
-      setHalls(r.data)
+      const data = await settings.halls()
+      setHalls(data)
       setLoading(false)
     } catch (err: any) {
       console.error('Failed to seed halls:', err)
@@ -93,13 +101,37 @@ export default function Halls() {
               </a>
             </div>
           </div>
-          <div className="flex justify-between">
+          <div className="flex justify-between border-b border-slate-100 pb-1">
             <span>Timeout Setting:</span>
             <span className="text-slate-700 font-bold">{api.defaults.timeout}ms</span>
           </div>
+          {errorDetails && (
+            <>
+              <div className="flex justify-between border-b border-slate-100 pb-1">
+                <span>Error Code:</span>
+                <span className="text-red-600 font-bold">{errorDetails.code || 'N/A'}</span>
+              </div>
+              <div className="flex justify-between border-b border-slate-100 pb-1">
+                <span>HTTP Status:</span>
+                <span className="text-red-600 font-bold">{errorDetails.status || 'N/A'}</span>
+              </div>
+              {errorDetails.data && (
+                <div className="pt-1">
+                  <span className="block mb-1">Response Data:</span>
+                  <pre className="bg-slate-50 p-2 rounded text-[9px] overflow-auto max-h-24 border border-slate-100">
+                    {JSON.stringify(errorDetails.data, null, 2)}
+                  </pre>
+                </div>
+              )}
+            </>
+          )}
         </div>
 
         <div className="pt-4 border-t border-slate-100">
+          <p className="text-xs text-slate-500 mb-3 leading-relaxed">
+            Если вы нажали «Обновить» и увидели белую страницу «Not Found», вернитесь на главную:
+            <a href="/" className="ml-1 text-indigo-600 font-bold hover:underline">Вернуться в Дашборд</a>
+          </p>
           <p className="text-xs text-slate-600 mb-2 font-medium">Введите адрес бэкенда вручную (из Dashboard Render):</p>
           <div className="flex gap-2">
             <input 
