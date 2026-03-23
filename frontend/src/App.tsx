@@ -1,7 +1,5 @@
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom'
-import { useAuth } from './context/AuthContext'
 import Layout from './components/Layout'
-import Login from './pages/Login'
 import Dashboard from './pages/Dashboard'
 import Deals from './pages/Deals'
 import DealCard from './pages/DealCard'
