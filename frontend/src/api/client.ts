@@ -2,8 +2,6 @@ import axios from 'axios'
 
 export const RAW_VITE_URL = (import.meta as any).env.VITE_API_URL
 const VITE_API_URL = RAW_VITE_URL
-let API_BASE = '/api'
-
 // Logic to determine API_BASE
 function determineBase() {
   const override = typeof window !== 'undefined' ? localStorage.getItem('VITE_API_URL_OVERRIDE') : null
