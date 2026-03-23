@@ -52,4 +52,4 @@ services:
         fromService:
           name: event-crm-backend
           type: web
-          property: host
+          property: url

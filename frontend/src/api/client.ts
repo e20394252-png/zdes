@@ -1,9 +1,21 @@
 import axios from 'axios'
 
 const VITE_API_URL = (import.meta as any).env.VITE_API_URL
-const API_BASE = VITE_API_URL 
-  ? `https://${VITE_API_URL}/api` 
-  : '/api'
+let API_BASE = '/api'
+
+if (VITE_API_URL) {
+  let host = VITE_API_URL
+  // If it's a Render internal host (no dots), append .onrender.com
+  if (!host.includes('.') && !host.includes('localhost') && !host.startsWith('http')) {
+    host += '.onrender.com'
+  }
+  
+  if (host.startsWith('http')) {
+    API_BASE = host.endsWith('/') ? `${host}api` : `${host}/api`
+  } else {
+    API_BASE = `https://${host}/api`
+  }
+}
 
 export const api = axios.create({
   baseURL: API_BASE,
