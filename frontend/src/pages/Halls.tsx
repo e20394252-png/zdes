@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { settings, api } from '../api/client'
+import { settings, api, RAW_VITE_URL } from '../api/client'
 
 type Hall = { id: number; name: string; description?: string; default_price?: number }
 
@@ -62,14 +62,18 @@ export default function Halls() {
   
   if (error) return (
     <div className="p-8 text-center text-red-500 bg-red-50 rounded-xl border border-red-100">
-      <p className="font-semibold">Ошибка подключения к серверу</p>
-      <p className="text-sm opacity-80">{error}</p>
-      <div className="mt-4 p-3 bg-white/50 rounded border border-red-100 text-xs font-mono break-all text-slate-500">
-        Попытка подключения к: {api.defaults.baseURL}
+      <p className="font-semibold text-lg mb-2">Ошибка подключения к серверу</p>
+      <p className="text-sm opacity-80 mb-4">{error}</p>
+      
+      <div className="max-w-md mx-auto p-4 bg-white/80 rounded-xl border border-red-100 text-xs font-mono text-left space-y-2 text-slate-600 shadow-inner">
+        <div><span className="text-slate-400">Raw VITE_API_URL:</span> {RAW_VITE_URL || '(empty)'}</div>
+        <div><span className="text-slate-400">Final API_BASE:</span> {api.defaults.baseURL}</div>
+        <div><span className="text-slate-400">Note:</span> {api.defaults.baseURL?.includes('.onrender.com') ? 'Public URL' : 'Relative/Internal URL'}</div>
       </div>
+
       <button 
         onClick={() => window.location.reload()}
-        className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700"
+        className="mt-6 px-6 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 shadow-sm transition-all"
       >
         Попробовать еще раз
       </button>

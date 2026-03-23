@@ -1,11 +1,11 @@
 import axios from 'axios'
 
-const VITE_API_URL = (import.meta as any).env.VITE_API_URL
+export const RAW_VITE_URL = (import.meta as any).env.VITE_API_URL
+const VITE_API_URL = RAW_VITE_URL
 let API_BASE = '/api'
 
 if (VITE_API_URL) {
   let host = VITE_API_URL
-  // If it's a Render internal host (no dots), append .onrender.com
   if (!host.includes('.') && !host.includes('localhost') && !host.startsWith('http')) {
     host += '.onrender.com'
   }
@@ -20,6 +20,7 @@ if (VITE_API_URL) {
 export const api = axios.create({
   baseURL: API_BASE,
   headers: { 'Content-Type': 'application/json' },
+  timeout: 10000, // 10 seconds timeout
 })
 
 api.interceptors.request.use((config) => {
