@@ -12,12 +12,12 @@ _qr_login = None
 
 async def get_telethon_client():
     global _client
-    if _client is None and _settings.TELEGRAM_API_ID and _settings.TELEGRAM_API_HASH:
+    if _client is None and _settings.telegram_api_id_int != 0 and _settings.TELEGRAM_API_HASH:
         from telethon import TelegramClient
         from telethon.sessions import StringSession
         _client = TelegramClient(
             StringSession(),
-            _settings.TELEGRAM_API_ID,
+            _settings.telegram_api_id_int,
             _settings.TELEGRAM_API_HASH,
         )
         await _client.connect()
