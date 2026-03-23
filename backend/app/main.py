@@ -45,17 +45,29 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
 )
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
+# --- Manual CORS Middleware ---
+@app.middleware("http")
+async def add_cors_header(request, call_next):
+    if request.method == "OPTIONS":
+        from fastapi import Response
+        response = Response()
+    else:
+        response = await call_next(request)
+    
+    origin = request.headers.get("origin")
+    if origin in [
         "https://event-crm-frontend.onrender.com",
         "http://localhost:5173",
-        "http://localhost:4173",
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+        "http://localhost:4173"
+    ]:
+        response.headers["Access-Control-Allow-Origin"] = origin
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With"
+        response.headers["Access-Control-Max-Age"] = "86400"
+    
+    return response
+
 app.include_router(api, prefix="/api")
 
 @app.get("/health")
