@@ -12,10 +12,13 @@ settings = get_settings()
 async def lifespan(app: FastAPI):
     print("DEBUG: Application starting up...")
     # Create tables if not exist
-    async with engine.begin() as conn:
-        print("DEBUG: Running migrations/table creation...")
-        await conn.run_sync(Base.metadata.create_all)
-        print("DEBUG: Migrations/table creation finished")
+    try:
+        async with engine.begin() as conn:
+            print("DEBUG: Running migrations/table creation...")
+            await conn.run_sync(Base.metadata.create_all)
+            print("DEBUG: Migrations/table creation finished")
+    except Exception as e:
+        print(f"DEBUG: Table creation FAILED (but starting anyway): {e}")
         
     # Seed default funnel and admin if empty
     try:
