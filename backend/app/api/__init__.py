@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from app.api import auth, dashboard, deals, contacts, tasks, calendar, settings, telethon_routes
 
-api = APIRouter(prefix="/api")
+api = APIRouter()
 api.include_router(auth.router)
 api.include_router(dashboard.router)
 api.include_router(deals.router)
