@@ -1,18 +1,16 @@
 import { NavLink } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
 
 const nav = [
   { to: '/', label: 'Дашборд' },
   { to: '/deals', label: 'Сделки' },
   { to: '/contacts', label: 'Контакты' },
   { to: '/tasks', label: 'Задачи' },
+  { to: '/halls', label: 'Залы' },
   { to: '/calendar', label: 'Календарь' },
   { to: '/settings', label: 'Настройки' },
 ]
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const { setToken } = useAuth()
-
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-slate-50">
       <aside className="w-full md:w-56 bg-white border-b md:border-b-0 md:border-r border-slate-200 shrink-0">
@@ -37,14 +35,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </NavLink>
           ))}
         </nav>
-        <div className="p-2 mt-auto border-t border-slate-100">
-          <button
-            onClick={() => setToken(null)}
-            className="w-full px-3 py-2 text-left text-sm text-slate-500 hover:bg-slate-50 rounded-lg"
-          >
-            Выйти
-          </button>
-        </div>
       </aside>
       <main className="flex-1 p-4 md:p-6 overflow-auto">
         {children}

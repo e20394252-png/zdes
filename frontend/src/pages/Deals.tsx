@@ -139,7 +139,7 @@ export default function Deals() {
           onClick={() => navigate('/deals/new')}
           className="ml-auto px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-500"
         >
-          + Новая сделка
+          + Новое бронирование
         </button>
       </div>
 

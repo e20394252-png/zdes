@@ -5,7 +5,6 @@ import { deals, contacts, settings } from '../api/client'
 type Contact = { id: number; name: string; company?: string; email?: string; phone?: string }
 type Hall = { id: number; name: string }
 type Stage = { id: number; name: string }
-type User = { id: number; full_name: string }
 type DealData = {
   id: number
   title: string
@@ -36,12 +35,12 @@ export default function DealCard() {
   const [contactsList, setContactsList] = useState<Contact[]>([])
   const [halls, setHalls] = useState<Hall[]>([])
   const [funnels, setFunnels] = useState<{ id: number; stages: Stage[] }[]>([])
-  const [managers, setManagers] = useState<User[]>([])
   const [saving, setSaving] = useState(false)
+  const [showNewClient, setShowNewClient] = useState(false)
+  const [newClient, setNewClient] = useState({ name: '', phone: '', email: '' })
   const [form, setForm] = useState({
     title: '',
     contact_id: null as number | null,
-    responsible_id: null as number | null,
     stage_id: 0,
     hall_id: null as number | null,
     event_date: '',
@@ -63,7 +62,6 @@ export default function DealCard() {
       if (r.data[0]?.stages?.length && isNew)
         setForm((f) => ({ ...f, stage_id: r.data[0].stages[0].id }))
     })
-    settings.managers().then((r) => setManagers(r.data))
   }, [isNew])
 
   useEffect(() => {
@@ -74,7 +72,6 @@ export default function DealCard() {
         setForm({
           title: d.title,
           contact_id: d.contact_id,
-          responsible_id: d.responsible_id ?? null,
           stage_id: d.stage_id,
           hall_id: d.hall_id,
           event_date: d.event_date ? d.event_date.slice(0, 10) : '',
@@ -98,7 +95,6 @@ export default function DealCard() {
       const payload = {
         title: form.title,
         contact_id: form.contact_id,
-        responsible_id: form.responsible_id ?? undefined,
         stage_id: form.stage_id,
         funnel_id: currentFunnel?.id ?? funnels[0]?.id ?? 1,
         hall_id: form.hall_id,
@@ -145,34 +141,58 @@ export default function DealCard() {
           ← Назад
         </button>
         <h1 className="text-2xl font-semibold text-slate-800">
-          {isNew ? 'Новая сделка' : deal?.title || 'Сделка'}
+          {isNew ? 'Новое бронирование' : deal?.title || 'Бронирование'}
         </h1>
       </div>
 
       <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
         <div className="p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Название / Тема</label>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Мероприятие</label>
             <input
               value={form.title}
               onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
               className="w-full px-3 py-2 border border-slate-300 rounded-lg"
               required
+              placeholder="Название мероприятия"
             />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Контакт</label>
-              <select
-                value={form.contact_id ?? ''}
-                onChange={(e) => setForm((f) => ({ ...f, contact_id: e.target.value ? Number(e.target.value) : null }))}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg"
-              >
-                <option value="">— Выберите —</option>
-                {contactsList.map((c) => (
-                  <option key={c.id} value={c.id}>{c.name} {c.company ? `(${c.company})` : ''}</option>
-                ))}
-              </select>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-sm font-medium text-slate-700">Клиент</label>
+                <button type="button" onClick={() => setShowNewClient(!showNewClient)} className="text-xs text-primary-600 hover:underline">
+                  {showNewClient ? 'Отмена' : '+ Создать клиента'}
+                </button>
+              </div>
+              {showNewClient ? (
+                <div className="space-y-2 p-3 bg-slate-50 rounded-lg border border-slate-200">
+                  <input placeholder="Имя *" value={newClient.name} onChange={(e) => setNewClient((c) => ({ ...c, name: e.target.value }))} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
+                  <input placeholder="Телефон" value={newClient.phone} onChange={(e) => setNewClient((c) => ({ ...c, phone: e.target.value }))} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
+                  <input placeholder="Email" value={newClient.email} onChange={(e) => setNewClient((c) => ({ ...c, email: e.target.value }))} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
+                  <button type="button" onClick={async () => {
+                    if (!newClient.name) return
+                    try {
+                      const { data } = await contacts.create(newClient)
+                      setContactsList((prev) => [data, ...prev])
+                      setForm((f) => ({ ...f, contact_id: data.id }))
+                      setNewClient({ name: '', phone: '', email: '' })
+                      setShowNewClient(false)
+                    } catch (_) {}
+                  }} className="px-3 py-1.5 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-500">Добавить</button>
+                </div>
+              ) : (
+                <select
+                  value={form.contact_id ?? ''}
+                  onChange={(e) => setForm((f) => ({ ...f, contact_id: e.target.value ? Number(e.target.value) : null }))}
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg"
+                >
+                  <option value="">— Выберите —</option>
+                  {contactsList.map((c) => (
+                    <option key={c.id} value={c.id}>{c.name} {c.company ? `(${c.company})` : ''}</option>
+                  ))}
+                </select>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Этап воронки</label>
@@ -183,19 +203,6 @@ export default function DealCard() {
               >
                 {currentFunnel?.stages?.map((s) => (
                   <option key={s.id} value={s.id}>{s.name}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Ответственный</label>
-              <select
-                value={form.responsible_id ?? ''}
-                onChange={(e) => setForm((f) => ({ ...f, responsible_id: e.target.value ? Number(e.target.value) : null }))}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg"
-              >
-                <option value="">— Не назначен —</option>
-                {managers.map((m) => (
-                  <option key={m.id} value={m.id}>{m.full_name}</option>
                 ))}
               </select>
             </div>

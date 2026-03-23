@@ -5,6 +5,8 @@ import Deals from './pages/Deals'
 import DealCard from './pages/DealCard'
 import Contacts from './pages/Contacts'
 import Tasks from './pages/Tasks'
+import Halls from './pages/Halls'
+import HallCalendar from './pages/HallCalendar'
 import Calendar from './pages/Calendar'
 import Settings from './pages/Settings'
 
@@ -26,6 +28,8 @@ export default function App() {
         <Route path="deals/:id" element={<DealCard />} />
         <Route path="contacts" element={<Contacts />} />
         <Route path="tasks" element={<Tasks />} />
+        <Route path="halls" element={<Halls />} />
+        <Route path="halls/:id/calendar" element={<HallCalendar />} />
         <Route path="calendar" element={<Calendar />} />
         <Route path="settings" element={<Settings />} />
       </Route>
