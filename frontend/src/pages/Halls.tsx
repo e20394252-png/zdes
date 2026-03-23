@@ -76,6 +76,10 @@ export default function Halls() {
             <span className="text-slate-700 font-bold">{RAW_VITE_URL || '(empty)'}</span>
           </div>
           <div className="flex justify-between border-b border-slate-100 pb-1">
+            <span>Current Origin:</span>
+            <span className="text-slate-700 font-bold">{typeof window !== 'undefined' ? window.location.origin : 'N/A'}</span>
+          </div>
+          <div className="flex justify-between border-b border-slate-100 pb-1">
             <span>Final API_BASE:</span>
             <div className="text-right">
               <div className="text-slate-700 font-bold">{api.defaults.baseURL}</div>
