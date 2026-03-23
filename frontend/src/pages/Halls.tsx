@@ -24,6 +24,7 @@ export default function Halls() {
   const [halls, setHalls] = useState<Hall[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [manualUrl, setManualUrl] = useState('')
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -60,8 +61,6 @@ export default function Halls() {
 
   if (loading) return <div className="p-8 text-center text-slate-500 animate-pulse">Загрузка залов...</div>
   
-  const [manualUrl, setManualUrl] = useState('')
-
   if (error) return (
     <div className="p-8 text-center text-red-500 bg-red-50 rounded-xl border border-red-100 max-w-2xl mx-auto shadow-sm">
       <p className="font-semibold text-xl mb-2 text-red-700">Ошибка подключения к серверу</p>
