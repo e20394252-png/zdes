@@ -5,17 +5,28 @@ from app.config import get_settings
 
 settings = get_settings()
 
-engine = create_async_engine(
-    settings.sqlalchemy_database_url,
-    pool_size=5,
-    max_overflow=10,
-)
+_engine = None
+_AsyncSessionLocal = None
 
-AsyncSessionLocal = async_sessionmaker(
-    engine,
-    class_=AsyncSession,
-    expire_on_commit=False,
-)
+def get_engine():
+    global _engine
+    if _engine is None:
+        _engine = create_async_engine(
+            settings.sqlalchemy_database_url,
+            pool_size=5,
+            max_overflow=10,
+        )
+    return _engine
+
+def get_sessionmaker():
+    global _AsyncSessionLocal
+    if _AsyncSessionLocal is None:
+        _AsyncSessionLocal = async_sessionmaker(
+            get_engine(),
+            class_=AsyncSession,
+            expire_on_commit=False,
+        )
+    return _AsyncSessionLocal
 
 class Base(DeclarativeBase):
     pass
@@ -23,7 +34,8 @@ class Base(DeclarativeBase):
 # REAL get_db (Safe version)
 async def get_db():
     try:
-        async with AsyncSessionLocal() as session:
+        session_maker = get_sessionmaker()
+        async with session_maker() as session:
             try:
                 yield session
                 await session.commit()
@@ -43,11 +55,14 @@ async def get_db():
                         class MockScalars:
                             def all(self): return []
                             def first(self): return None
+                            def unique(self): return self
                         return MockScalars()
                     def scalar_one_or_none(self): return None
+                    def scalar_one(self): raise Exception("Stub Failure")
                 return MockResult()
             def scalars(self): return self
             def scalar_one_or_none(self): return None
+            def unique(self): return self
             def all(self): return []
             async def commit(self): pass
             async def rollback(self): pass
