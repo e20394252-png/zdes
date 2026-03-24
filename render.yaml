@@ -41,9 +41,9 @@ services:
         sync: false
 
   # Frontend Static Site
-  - type: static
+  - type: web
     name: event-crm-frontend
-    plan: free
+    runtime: static
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
