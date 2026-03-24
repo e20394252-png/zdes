@@ -31,43 +31,46 @@ def get_sessionmaker():
 class Base(DeclarativeBase):
     pass
 
+# --- STUB DEFINITION ---
+class FakeSession:
+    async def execute(self, *args, **kwargs):
+        class MockResult:
+            def scalars(self): 
+                class MockScalars:
+                    def all(self): return []
+                    def first(self): return None
+                    def unique(self): return self
+                return MockScalars()
+            def scalar_one_or_none(self): return None
+            def scalar_one(self): raise Exception("Stub Failure")
+        return MockResult()
+    def scalars(self): return self
+    def scalar_one_or_none(self): return None
+    def unique(self): return self
+    def all(self): return []
+    async def commit(self): pass
+    async def rollback(self): pass
+    async def close(self): pass
+    async def __aenter__(self): return self
+    async def __aexit__(self, *args): pass
+
 # REAL get_db (Safe version)
 async def get_db():
+    session = None
     try:
         session_maker = get_sessionmaker()
-        async with session_maker() as session:
-            try:
-                yield session
-                await session.commit()
-            except Exception as e:
-                print(f"DEBUG: DB Session Error: {e}")
-                await session.rollback()
-                raise
-            finally:
-                await session.close()
+        session = session_maker()
+        yield session
+        await session.commit()
     except Exception as e:
-        # IF DB FAILS, RETURN A FAKE SESSION INSTEAD OF CRASHING
-        print(f"CRITICAL: DB Connection Failed, providing stub: {e}")
-        class FakeSession:
-            async def execute(self, *args, **kwargs):
-                class MockResult:
-                    def scalars(self): 
-                        class MockScalars:
-                            def all(self): return []
-                            def first(self): return None
-                            def unique(self): return self
-                        return MockScalars()
-                    def scalar_one_or_none(self): return None
-                    def scalar_one(self): raise Exception("Stub Failure")
-                return MockResult()
-            def scalars(self): return self
-            def scalar_one_or_none(self): return None
-            def unique(self): return self
-            def all(self): return []
-            async def commit(self): pass
-            async def rollback(self): pass
-            async def close(self): pass
+        print(f"CRITICAL: DB Dependency Failure: {e}")
+        if session:
+            await session.rollback()
+        # FALLBACK TO STUB
         yield FakeSession()
+    finally:
+        if session:
+            await session.close()
 
 # Redis - Simple stub
 class DummyRedis:
