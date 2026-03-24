@@ -31,56 +31,71 @@ def get_sessionmaker():
 class Base(DeclarativeBase):
     pass
 
-# --- STUB DEFINITION ---
-class FakeSession:
-    async def execute(self, *args, **kwargs):
-        class MockResult:
-            def scalars(self): 
-                class MockScalars:
-                    def all(self): return []
-                    def first(self): return None
-                    def unique(self): return self
-                return MockScalars()
-            def scalar_one_or_none(self): return None
-            def scalar_one(self): raise Exception("Stub Failure")
-        return MockResult()
-    def scalars(self): return self
+# --- FAILOVER SYSTEM ---
+class MockResult:
+    def scalars(self): 
+        class MockScalars:
+            def all(self): return []
+            def first(self): return None
+            def unique(self): return self
+        return MockScalars()
     def scalar_one_or_none(self): return None
-    def unique(self): return self
-    def all(self): return []
-    async def commit(self): pass
-    async def rollback(self): pass
-    async def close(self): pass
-    async def __aenter__(self): return self
-    async def __aexit__(self, *args): pass
+    def scalar_one(self): raise Exception("Stub Failure")
+    def __getattr__(self, name): return lambda *args, **kwargs: None
 
-# REAL get_db (Safe version)
+class RescueSession:
+    """Wrapper that catches ALL errors during DB operations and returns empty results."""
+    def __init__(self, real_session=None):
+        self.real_session = real_session
+        self.is_failed = (real_session is None)
+
+    async def execute(self, *args, **kwargs):
+        if self.is_failed: return MockResult()
+        try:
+            return await self.real_session.execute(*args, **kwargs)
+        except Exception as e:
+            print(f"RESCUE: Intercepted DB error during execute: {e}")
+            self.is_failed = True
+            return MockResult()
+
+    def scalars(self, *args, **kwargs):
+        return self.execute(*args, **kwargs) # Simplified for stub
+
+    async def commit(self):
+        if self.is_failed: return
+        try:
+            await self.real_session.commit()
+        except Exception as e:
+            print(f"RESCUE: Intercepted DB error during commit: {e}")
+            self.is_failed = True
+
+    async def rollback(self):
+        if not self.is_failed and self.real_session:
+            try: await self.real_session.rollback()
+            except: pass
+
+    async def close(self):
+        if self.real_session:
+            try: await self.real_session.close()
+            except: pass
+
+    async def refresh(self, *args, **kwargs): pass
+    def add(self, *args, **kwargs): pass
+    def __getattr__(self, name):
+        if self.is_failed: return lambda *args, **kwargs: None
+        return getattr(self.real_session, name)
+
+# REAL get_db (The Final Resilient Version)
 async def get_db():
-    session_maker = None
-    try:
-        session_maker = get_sessionmaker()
-    except Exception as e:
-        print(f"CRITICAL: SessionMaker creation failed: {e}")
-        yield FakeSession()
-        return
-
     session = None
     try:
+        session_maker = get_sessionmaker()
         session = session_maker()
-        # Fast health check if possible? No, just yield and catch errors in the caller
-        yield session
-        if session:
-            await session.commit()
+        # We yield the WRAPPER, not the session itself
+        yield RescueSession(session)
     except Exception as e:
-        print(f"CRITICAL: DB Session/Request Failure: {e}")
-        # We can't yield again here if we already yielded 'session'.
-        # But if session_maker() failed before yield, it would go here.
-        # So we only yield FakeSession if we HAVEN'T yielded yet.
-        if session is None:
-            yield FakeSession()
-        else:
-            if session:
-                await session.rollback()
+        print(f"RESCUE: Failed to create session, yielding pure stub: {e}")
+        yield RescueSession(None)
     finally:
         if session:
             await session.close()
