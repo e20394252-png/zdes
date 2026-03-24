@@ -56,18 +56,31 @@ class FakeSession:
 
 # REAL get_db (Safe version)
 async def get_db():
-    session = None
+    session_maker = None
     try:
         session_maker = get_sessionmaker()
-        session = session_maker()
-        yield session
-        await session.commit()
     except Exception as e:
-        print(f"CRITICAL: DB Dependency Failure: {e}")
-        if session:
-            await session.rollback()
-        # FALLBACK TO STUB
+        print(f"CRITICAL: SessionMaker creation failed: {e}")
         yield FakeSession()
+        return
+
+    session = None
+    try:
+        session = session_maker()
+        # Fast health check if possible? No, just yield and catch errors in the caller
+        yield session
+        if session:
+            await session.commit()
+    except Exception as e:
+        print(f"CRITICAL: DB Session/Request Failure: {e}")
+        # We can't yield again here if we already yielded 'session'.
+        # But if session_maker() failed before yield, it would go here.
+        # So we only yield FakeSession if we HAVEN'T yielded yet.
+        if session is None:
+            yield FakeSession()
+        else:
+            if session:
+                await session.rollback()
     finally:
         if session:
             await session.close()

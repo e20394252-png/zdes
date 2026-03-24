@@ -33,8 +33,19 @@ class Settings(BaseSettings):
         # Ensure asyncpg driver
         if url.startswith("postgresql://"):
             url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+        elif url.startswith("postgres://"):
+            url = url.replace("postgres://", "postgresql+asyncpg://", 1)
         elif not url.startswith("postgresql+asyncpg://"):
             url = f"postgresql+asyncpg://{url}"
+
+        # PORT INJECTION: If host exists but no port, add :5432
+        # Example: postgresql+asyncpg://user:pass@dpg-xxx-a/db
+        if "@" in url and "/" in url.split("@")[1] and ":" not in url.split("@")[1].split("/")[0]:
+            parts = url.split("@")
+            host_part = parts[1].split("/")
+            host_part[0] = f"{host_part[0]}:5432"
+            parts[1] = "/".join(host_part)
+            url = "@".join(parts)
             
         return url
 
