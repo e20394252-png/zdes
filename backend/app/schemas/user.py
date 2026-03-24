@@ -18,12 +18,12 @@ class UserUpdate(BaseModel):
 
 
 class UserRead(BaseModel):
-    id: int
+    id: int = 0
     email: str
     full_name: str
     role: UserRole
-    telegram_user_id: str | None
-    is_active: bool
+    telegram_user_id: str | None = None
+    is_active: bool = True
 
     class Config:
         from_attributes = True

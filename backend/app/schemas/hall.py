@@ -25,12 +25,12 @@ class HallUpdate(BaseModel):
 
 
 class HallRead(BaseModel):
-    id: int
+    id: int = 0
     name: str
-    description: str | None
-    is_active: bool
-    default_price: Decimal
-    created_at: datetime
+    description: str | None = None
+    is_active: bool = True
+    default_price: Decimal = Decimal("0")
+    created_at: datetime = datetime.now()
 
     class Config:
         from_attributes = True

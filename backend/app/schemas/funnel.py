@@ -11,13 +11,13 @@ class FunnelStageCreate(BaseModel):
 
 
 class FunnelStageRead(BaseModel):
-    id: int
-    funnel_id: int
+    id: int = 0
+    funnel_id: int = 0
     name: str
-    order: int
-    color: str | None
-    is_won: bool
-    is_lost: bool
+    order: int = 0
+    color: str | None = None
+    is_won: bool = False
+    is_lost: bool = False
 
     class Config:
         from_attributes = True
@@ -30,10 +30,10 @@ class FunnelCreate(BaseModel):
 
 
 class FunnelRead(BaseModel):
-    id: int
+    id: int = 0
     name: str
-    is_default: bool
-    created_at: datetime
+    is_default: bool = False
+    created_at: datetime = datetime.now()
     stages: list[FunnelStageRead] = []
 
     class Config:
