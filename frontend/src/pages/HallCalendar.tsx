@@ -62,7 +62,8 @@ export default function HallCalendar() {
 
   useEffect(() => {
     settings.halls().then((r) => {
-      const found = r.data.find((h: Hall) => h.id === hallId)
+      const hallsArr = r || []
+      const found = hallsArr.find((h: Hall) => h.id === hallId)
       setHall(found || null)
       if (found) setBookForm((f) => ({ ...f, rental_price: Number((found as any).default_price) || 0 }))
     })
@@ -75,8 +76,8 @@ export default function HallCalendar() {
   }, [current, hallId])
 
   useEffect(() => {
-    contacts.list({ limit: 500 }).then((r) => setContactsList(r.data))
-    settings.funnels().then((r) => setFunnels(r.data))
+    contacts.list({ limit: 500 }).then((r) => setContactsList(r || []))
+    settings.funnels().then((r) => setFunnels(r || []))
   }, [])
 
   const slotsByDate = (d: Date) => {

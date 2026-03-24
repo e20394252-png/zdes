@@ -59,9 +59,9 @@ export default function Calendar() {
   const days = eachDayOfInterval({ start: monthStart, end: monthEnd })
 
   useEffect(() => {
-    settings.halls().then((r) => setHalls(r.data))
-    contacts.list({ limit: 500 }).then((r) => setContactsList(r.data))
-    settings.funnels().then((r) => setFunnels(r.data))
+    settings.halls().then((r) => setHalls(r || []))
+    contacts.list({ limit: 500 }).then((r) => setContactsList(r || []))
+    settings.funnels().then((r) => setFunnels(r || []))
   }, [])
 
   useEffect(() => {
