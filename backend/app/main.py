@@ -9,14 +9,30 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
-# Global CORS - Wildcard is safe for Bearer tokens without cookies
+# Production CORS config
+origins = [
+    "https://event-crm-frontend.onrender.com",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
+    allow_origins=origins,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Debug Middleware to ensure headers are present
+@app.middleware("http")
+async def add_cors_debug_header(request, call_next):
+    response = await call_next(request)
+    origin = request.headers.get("origin")
+    if origin in origins:
+        response.headers["Access-Control-Allow-Origin"] = origin
+        response.headers["Access-Control-Allow-Credentials"] = "true"
+    return response
 
 @app.get("/")
 @app.get("/health")
