@@ -27,6 +27,12 @@ function determineBase() {
       return `https://${host}/api`
     }
   }
+
+  // Production fallback for Render
+  if (typeof window !== 'undefined' && window.location.hostname.includes('onrender.com')) {
+    return 'https://event-crm-backend-cb34.onrender.com/api'
+  }
+
   return '/api'
 }
 

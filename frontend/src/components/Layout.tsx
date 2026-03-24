@@ -1,14 +1,20 @@
 import { NavLink } from 'react-router-dom'
 import { useState, useEffect } from 'react'
+import { api } from '../api/client'
 
 function HealthIndicator() {
   const [status, setStatus] = useState<'ok' | 'fail' | 'loading'>('loading')
   
   useEffect(() => {
-    fetch(`${(import.meta as any).env.VITE_API_URL || ''}/api/health`)
-      .then(res => res.json())
-      .then(data => setStatus(data.resilient_mode ? 'fail' : 'ok'))
-      .catch(() => setStatus('fail'))
+    const checkHealth = async () => {
+      try {
+        const res = await api.get('/health')
+        setStatus(res.data.resilient_mode ? 'fail' : 'ok')
+      } catch {
+        setStatus('fail')
+      }
+    }
+    checkHealth()
   }, [])
 
   return (
