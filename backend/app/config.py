@@ -21,20 +21,20 @@ class Settings(BaseSettings):
 
     @property
     def sqlalchemy_database_url(self) -> str:
-        # Default fallback for development
-        default_db = "postgresql+asyncpg://postgres:postgres@localhost:5432/event_crm"
-        url = os.environ.get("DATABASE_URL") or self.DATABASE_URL or default_db
-        
-        # Render internal URL takes precedence
-        internal_url = os.environ.get("RENDER_POSTGRES_INTERNAL_URL")
-        if internal_url:
-            url = internal_url
-
-        # Fix drivers
-        if url.startswith("postgres://"):
-            url = url.replace("postgres://", "postgresql+asyncpg://", 1)
-        elif url.startswith("postgresql://") and "asyncpg" not in url:
+        # Priority 1: Render Internal URL (Best)
+        url = os.environ.get("RENDER_POSTGRES_INTERNAL_URL")
+        # Priority 2: Standard Database URL
+        if not url:
+            url = os.environ.get("DATABASE_URL")
+            
+        if not url:
+            return ""
+            
+        # Ensure asyncpg driver
+        if url.startswith("postgresql://"):
             url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+        elif not url.startswith("postgresql+asyncpg://"):
+            url = f"postgresql+asyncpg://{url}"
             
         return url
 
