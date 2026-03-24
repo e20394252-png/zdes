@@ -101,17 +101,26 @@ class RescueSession:
 # REAL get_db (The Final Resilient Version)
 async def get_db():
     session = None
+    yielded = False
     try:
         session_maker = get_sessionmaker()
         session = session_maker()
-        # We yield the WRAPPER, not the session itself
+        yielded = True
         yield RescueSession(session)
     except Exception as e:
-        print(f"RESCUE: Failed to create session, yielding pure stub: {e}")
-        yield RescueSession(None)
+        print(f"RESCUE: DB error in generator: {e}")
+        if not yielded:
+            yield RescueSession(None)
+        else:
+            # If we already yielded, we can't yield again.
+            # Just let the exception propagate or handle cleanup.
+            raise
     finally:
         if session:
-            await session.close()
+            try:
+                await session.close()
+            except:
+                pass
 
 # Redis - Simple stub
 class DummyRedis:
