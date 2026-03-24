@@ -24,11 +24,41 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.get("/")
+from sqlalchemy import text
+from app.database import get_db, get_engine, RescueSession
+
 @app.get("/health")
 async def health():
-    return {"status": "ok", "message": "Production server is LIVE (Resilient Mode v2)"}
-    return {"status": "ok", "message": "Production server is LIVE (Resilient Mode)"}
+    return {
+        "status": "ok", 
+        "message": "Production server is LIVE",
+        "resilient_mode": True
+    }
+
+@app.get("/api/health/postgres")
+async def check_postgres():
+    """Detailed diagnostics that bypasses RescueSession mask."""
+    engine = get_engine()
+    try:
+        async with engine.connect() as conn:
+            result = await conn.execute(text("SELECT 1"))
+            return {"status": "connected", "result": result.scalar()}
+    except Exception as e:
+        return {
+            "status": "error",
+            "error_type": type(e).__name__,
+            "error_message": str(e),
+            "hint": "Check DATABASE_URL and Render environment variables."
+        }
+
+@app.get("/api/health/diagnostics")
+async def full_diagnostics():
+    """System-wide health check including environment."""
+    return {
+        "database_url_configured": bool(os.getenv("DATABASE_URL") or os.getenv("RENDER_POSTGRES_INTERNAL_URL")),
+        "database_url_type": "internal" if os.getenv("RENDER_POSTGRES_INTERNAL_URL") else "external",
+        "env_stage": os.getenv("RENDER_EXTERNAL_HOSTNAME", "local"),
+    }
 
 # Include all real routes
 app.include_router(api, prefix="/api")

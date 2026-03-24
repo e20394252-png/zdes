@@ -18,7 +18,7 @@ export default function Contacts() {
 
   useEffect(() => {
     contactsApi.list({ search: search || undefined, limit: 200 }).then((r) => {
-      setList(r.data)
+      setList(r)
       setLoading(false)
     })
   }, [search])

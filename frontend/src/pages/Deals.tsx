@@ -95,13 +95,13 @@ export default function Deals() {
 
   useEffect(() => {
     settings.funnels().then((r) => {
-      setFunnels(r.data)
-      if (r.data.length && !funnelId) setFunnelId(r.data[0].id)
+      setFunnels(r)
+      if (r.length && !funnelId) setFunnelId(r[0].id)
     })
   }, [])
 
   useEffect(() => {
-    if (funnelId) deals.list({ funnel_id: funnelId }).then((r) => setDealsList(r.data))
+    if (funnelId) deals.list({ funnel_id: funnelId }).then((r) => setDealsList(r))
   }, [funnelId])
 
   async function handleDrop(dealId: number, stageId: number) {
