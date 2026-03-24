@@ -1,33 +1,45 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.ext.asyncio import AsyncSession
 from app.api import api
-
-# --- STUBS FOR DIAGNOSTICS ---
-async def stub_get_db():
-    # Return nothing, just to satisfy the type
-    class FakeSession:
-        async def execute(self, *args, **kwargs): return self
-        def scalars(self): return self
-        def all(self): return []
-        def scalar_one_or_none(self): return None
-        async def commit(self): pass
-        async def rollback(self): pass
-        async def close(self): pass
-    yield FakeSession()
-
-async def stub_require_user():
-    # Return a dummy user
-    from app.models.user import User
-    return User(id=1, email="stub@example.com", full_name="Stub User")
-
-app = FastAPI(title="Event CRM API (Stubbed)")
-
-# Override dependencies globally
-from app.database import get_db
+from app.config import get_settings
+from app.database import engine, Base, get_db
+from app.models.user import User
 from app.core.deps import require_user
-app.dependency_overrides[get_db] = stub_get_db
-app.dependency_overrides[require_user] = stub_require_user
+
+settings = get_settings()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("DEBUG: Application starting up (Production Final)...")
+    
+    async def startup_tasks():
+        try:
+            async with engine.begin() as conn:
+                print("DEBUG: Synchronizing database schema...")
+                await conn.run_sync(Base.metadata.create_all)
+            
+            from app.seed import seed, ensure_halls
+            await seed()
+            await ensure_halls()
+            print("DEBUG: Background initialization finished")
+        except Exception as e:
+            print(f"DEBUG: Background initialization FAILED: {e}")
+
+    import asyncio
+    asyncio.create_task(startup_tasks())
+    
+    yield
+    print("DEBUG: Application shutting down...")
+    await engine.dispose()
+
+app = FastAPI(
+    title=settings.APP_NAME,
+    lifespan=lifespan,
+    docs_url="/docs",
+    redoc_url="/redoc",
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -41,4 +53,13 @@ app.include_router(api, prefix="/api")
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "message": "Stubbed production server is UP"}
+    return {"status": "ok", "message": "Production server is LIVE"}
+
+@app.get("/api/test-db")
+async def test_db(db: AsyncSession = Depends(get_db)):
+    try:
+        from sqlalchemy import text
+        await db.execute(text("SELECT 1"))
+        return {"status": "ok", "message": "Database is reachable!"}
+    except Exception as e:
+        return {"status": "error", "message": f"DB unreachable: {e}"}

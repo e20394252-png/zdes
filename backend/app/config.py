@@ -16,25 +16,32 @@ class Settings(BaseSettings):
     DEBUG: bool = False
 
     # Database
-    DATABASE_URL: str = "postgresql+asyncpg://postgres:postgres@db:5432/event_crm"
-    REDIS_URL: str = "redis://redis:6379/0"
+    DATABASE_URL: str = ""
+    REDIS_URL: str = ""
 
     @property
     def sqlalchemy_database_url(self) -> str:
-        url = os.environ.get("DATABASE_URL") or self.DATABASE_URL
+        # Default fallback for development
+        default_db = "postgresql+asyncpg://postgres:postgres@localhost:5432/event_crm"
+        url = os.environ.get("DATABASE_URL") or self.DATABASE_URL or default_db
         
-        # Priority: Render Internal URL if available
+        # Render internal URL takes precedence
         internal_url = os.environ.get("RENDER_POSTGRES_INTERNAL_URL")
         if internal_url:
             url = internal_url
 
-        # Ensure asyncpg driver
+        # Fix drivers
         if url.startswith("postgres://"):
             url = url.replace("postgres://", "postgresql+asyncpg://", 1)
         elif url.startswith("postgresql://") and "asyncpg" not in url:
             url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
             
         return url
+
+    @property
+    def redis_url_transformed(self) -> str:
+        default_redis = "redis://localhost:6379/0"
+        return os.environ.get("REDIS_URL") or self.REDIS_URL or default_redis
 
     # Auth
     SECRET_KEY: str = "change-me-in-production"
