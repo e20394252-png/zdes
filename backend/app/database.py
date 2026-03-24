@@ -79,8 +79,21 @@ class RescueSession:
             try: await self.real_session.close()
             except: pass
 
-    async def refresh(self, *args, **kwargs): pass
-    def add(self, *args, **kwargs): pass
+    async def refresh(self, instance, *args, **kwargs):
+        if self.is_failed: return
+        try:
+            await self.real_session.refresh(instance, *args, **kwargs)
+        except Exception as e:
+            print(f"RESCUE: Intercepted DB error during refresh: {e}")
+            self.is_failed = True
+
+    def add(self, instance, *args, **kwargs):
+        if self.is_failed: return
+        try:
+            self.real_session.add(instance, *args, **kwargs)
+        except Exception as e:
+            print(f"RESCUE: Intercepted DB error during add: {e}")
+            self.is_failed = True
     def __getattr__(self, name):
         if self.is_failed: return lambda *args, **kwargs: None
         return getattr(self.real_session, name)

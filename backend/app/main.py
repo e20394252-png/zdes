@@ -9,17 +9,11 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
-# Explicit CORS origins for production stability
-origins = [
-    "https://event-crm-frontend.onrender.com",
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-]
-
+# Global CORS - Wildcard is safe for Bearer tokens without cookies
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )

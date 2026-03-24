@@ -121,7 +121,7 @@ export default function Calendar() {
   async function handleCreateClient() {
     if (!newClient.name) return
     try {
-      const { data } = await contacts.create(newClient)
+      const data = await contacts.create(newClient)
       setContactsList((prev) => [data, ...prev])
       setBookForm((f) => ({ ...f, contact_id: data.id }))
       setNewClient({ name: '', phone: '', telegram_username: '' })
@@ -132,7 +132,7 @@ export default function Calendar() {
   async function handleCreateHall() {
     if (!newHall.name) return
     try {
-      const { data } = await settings.createHall(newHall)
+      const data = await settings.createHall(newHall)
       setHalls((prev) => [...prev, data])
       setBookForm((f) => ({ ...f, hall_id: data.id }))
       setNewHall({ name: '', description: '', default_price: 0 })

@@ -35,7 +35,7 @@ async def create_funnel(data: FunnelCreate, db: AsyncSession = Depends(get_db), 
             db.add(FunnelStage(funnel_id=funnel.id, name=s.name, order=s.order, color=s.color, is_won=s.is_won, is_lost=s.is_lost))
     if data.is_default:
         await db.execute(update(Funnel).where(Funnel.id != funnel.id).values(is_default=False))
-    await db.flush()
+    await db.commit()
     await db.refresh(funnel)
     result = await db.execute(select(Funnel).options(selectinload(Funnel.stages)).where(Funnel.id == funnel.id))
     return result.scalar_one()
@@ -52,7 +52,7 @@ async def update_funnel(funnel_id: int, data: dict, db: AsyncSession = Depends(g
     if data.get("is_default"):
         await db.execute(update(Funnel).where(Funnel.id != funnel_id).values(is_default=False))
         funnel.is_default = True
-    await db.flush()
+    await db.commit()
     await db.refresh(funnel)
     result = await db.execute(select(Funnel).options(selectinload(Funnel.stages)).where(Funnel.id == funnel_id))
     return result.scalar_one()
@@ -73,6 +73,7 @@ async def create_hall(data: HallCreate, db: AsyncSession = Depends(get_db), user
     if data.availability:
         for a in data.availability:
             db.add(HallAvailability(hall_id=hall.id, day_of_week=a.day_of_week, start_time=a.start_time, end_time=a.end_time, is_available=a.is_available))
+    await db.commit()
     await db.refresh(hall)
     return hall
 
@@ -85,7 +86,7 @@ async def update_hall(hall_id: int, data: HallUpdate, db: AsyncSession = Depends
         raise HTTPException(status_code=404, detail="Hall not found")
     for k, v in data.model_dump(exclude_unset=True).items():
         setattr(hall, k, v)
-    await db.flush()
+    await db.commit()
     await db.refresh(hall)
     return hall
 
@@ -111,7 +112,7 @@ async def create_manager(data: UserCreate, db: AsyncSession = Depends(get_db), u
         telegram_user_id=data.telegram_user_id,
     )
     db.add(u)
-    await db.flush()
+    await db.commit()
     await db.refresh(u)
     return u
 
@@ -154,7 +155,7 @@ async def update_telethon_config(data: TelethonConfigUpdate, db: AsyncSession = 
         await db.flush()
     for k, v in data.model_dump(exclude_unset=True).items():
         setattr(cfg, k, v)
-    await db.flush()
+    await db.commit()
 @router.get("/seed-halls")
 @router.post("/seed-halls")
 async def seed_halls_manual(db: AsyncSession = Depends(get_db)):
