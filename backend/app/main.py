@@ -28,6 +28,7 @@ from sqlalchemy import text
 from app.database import get_db, get_engine, RescueSession
 
 @app.get("/health")
+@app.get("/api/health")
 async def health():
     return {
         "status": "ok", 
