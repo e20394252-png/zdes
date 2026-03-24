@@ -21,21 +21,19 @@ class Settings(BaseSettings):
 
     @property
     def sqlalchemy_database_url(self) -> str:
-        # Priority 1: Direct OS env (bypassing Pydantic if needed)
-        url = os.getenv("DATABASE_URL") or self.DATABASE_URL
+        url = os.environ.get("DATABASE_URL") or self.DATABASE_URL
         
-        # Render provides postgres://, but asyncpg needs postgresql+asyncpg://
+        # Priority: Render Internal URL if available
+        internal_url = os.environ.get("RENDER_POSTGRES_INTERNAL_URL")
+        if internal_url:
+            url = internal_url
+
+        # Ensure asyncpg driver
         if url.startswith("postgres://"):
             url = url.replace("postgres://", "postgresql+asyncpg://", 1)
         elif url.startswith("postgresql://") and "asyncpg" not in url:
             url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
-        
-        # Fallback for Render specifically
-        if "@db:" in url and os.environ.get("RENDER"):
-            render_url = os.environ.get("RENDER_POSTGRES_INTERNAL_URL")
-            if render_url:
-                url = render_url.replace("postgres://", "postgresql+asyncpg://", 1)
-
+            
         return url
 
     # Auth
