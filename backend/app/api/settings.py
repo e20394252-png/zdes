@@ -176,10 +176,14 @@ async def update_telethon_config(data: TelethonConfigUpdate, db: AsyncSession = 
 @router.get("/seed-halls")
 @router.post("/seed-halls")
 async def seed_halls_manual(db: AsyncSession = Depends(get_db)):
-    from app.seed import ensure_halls
-    print("DEBUG: Manual seed-halls triggered")
-    await ensure_halls()
-    return {"status": "ok", "message": "Halls ensured"}
+    try:
+        from app.seed import ensure_halls
+        print("DEBUG: Manual seed-halls triggered")
+        await ensure_halls()
+        return {"status": "ok", "message": "Halls ensured"}
+    except Exception as e:
+        print(f"DEBUG: Manual seed-halls FAILED: {e}")
+        return {"status": "error", "message": str(e)}
 
 
 @router.get("/halls/count")
