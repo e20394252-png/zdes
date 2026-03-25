@@ -31,19 +31,27 @@ router = APIRouter(prefix="/settings", tags=["settings"])
 
 @router.get("/debug-db-dump")
 async def db_dump(db: AsyncSession = Depends(get_db)):
-    from sqlalchemy import text
+    from app.models.hall import Hall
     try:
-        res = await db.execute(select(Deal))
-        deals = res.scalars().all()
+        deals_res = await db.execute(select(Deal))
+        deals = deals_res.scalars().all()
+        halls_res = await db.execute(select(Hall))
+        halls = halls_res.scalars().all()
         return {
             "deals_count": len(deals),
+            "halls_count": len(halls),
+            "halls": [
+                {"id": h.id, "name": h.name, "is_active": h.is_active}
+                for h in halls
+            ],
             "deals": [
                 {
                     "id": d.id,
                     "title": d.title,
                     "date": d.event_date.isoformat() if d.event_date else None,
+                    "time_start": d.event_time_start.isoformat() if d.event_time_start else None,
+                    "time_end": d.event_time_end.isoformat() if d.event_time_end else None,
                     "hall_id": d.hall_id,
-                    "deleted": False # placeholder
                 }
                 for d in deals
             ]
