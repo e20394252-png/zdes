@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_
 from app.database import get_db
+from app.api.settings import debug_log
 from app.models.deal import Deal
 from app.models.hall import Hall
 from app.core.deps import require_user
@@ -45,6 +46,8 @@ async def get_slots(
     )
     if hall_id:
         q2 = q2.where(Deal.hall_id == hall_id)
+    
+    debug_log(f"Fetching slots from={from_date} to={to_date} hall={hall_id}")
     deals_result = await db.execute(q2)
     deals = list(deals_result.scalars().all())
 

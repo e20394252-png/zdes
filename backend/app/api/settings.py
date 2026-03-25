@@ -14,7 +14,22 @@ from app.core.security import get_password_hash
 from sqlalchemy.orm import selectinload
 from pydantic import BaseModel
 
+from datetime import datetime
+import collections
+
+DEBUG_LOGS = collections.deque(maxlen=100)
+
+def debug_log(msg: str):
+    ts = datetime.utcnow().strftime("%H:%M:%S")
+    full_msg = f"[{ts}] {msg}"
+    print(full_msg)
+    DEBUG_LOGS.append(full_msg)
+
 router = APIRouter(prefix="/settings", tags=["settings"])
+
+@router.get("/debug-logs")
+async def get_debug_logs():
+    return list(DEBUG_LOGS)
 
 
 # --- Funnels ---

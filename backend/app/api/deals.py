@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from app.database import get_db
+from app.api.settings import debug_log
 from app.models.deal import Deal, DealTask
 from app.models.contact import Contact
 from app.models.funnel import FunnelStage
@@ -60,6 +61,7 @@ async def create_deal(
     user: User = Depends(require_user),
     auto_invoice: bool = Query(True),
 ):
+    debug_log(f"Creating deal: {data.title}, hall={data.hall_id}, date={data.event_date}, time={data.event_time_start}-{data.event_time_end}")
     deal = Deal(
         title=data.title,
         contact_id=data.contact_id,
@@ -92,6 +94,7 @@ async def create_deal(
     await db.commit()
     await db.refresh(deal)
     result = await db.execute(select(Deal).where(Deal.id == deal.id).options(selectinload(Deal.stage), selectinload(Deal.contact), selectinload(Deal.extra_tasks)))
+    debug_log(f"Deal created successfully, ID={deal.id}")
     return result.scalar_one()
 
 
