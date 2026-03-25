@@ -30,10 +30,20 @@ from app.database import get_db, get_engine, RescueSession
 @app.get("/health")
 @app.get("/api/health")
 async def health():
+    """Health check that reflects real DB status."""
+    engine = get_engine()
+    resilient_mode = False
+    try:
+        async with engine.connect() as conn:
+            await conn.execute(text("SELECT 1"))
+    except Exception as e:
+        print(f"HEALTH CHECK FAILURE: {e}")
+        resilient_mode = True
+        
     return {
-        "status": "ok", 
+        "status": "ok" if not resilient_mode else "degraded", 
         "message": "Production server is LIVE",
-        "resilient_mode": True
+        "resilient_mode": resilient_mode
     }
 
 @app.get("/api/health/postgres")
@@ -67,4 +77,4 @@ app.include_router(api, prefix="/api")
 # Startup check (non-blocking)
 @app.on_event("startup")
 async def startup_event():
-    print("DEBUG: Application started in Resilient Mode")
+    print("DEBUG: Application started")

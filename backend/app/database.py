@@ -130,3 +130,6 @@ class DummyRedis:
 
 async def get_redis() -> Redis:
     return DummyRedis()
+
+# Export for seeding scripts
+AsyncSessionLocal = get_sessionmaker()
