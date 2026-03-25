@@ -101,8 +101,14 @@ export const tasks = {
 }
 
 export const calendar = {
-  slots: (from_date: string, to_date: string, hall_id?: number) =>
-    api.get('/calendar/slots', { params: { from_date, to_date, hall_id } }).then(res => res.data),
+  slots: (from_date: string, to_date: string, hall_id?: number | 'all') =>
+    api.get('/calendar/slots', { 
+      params: { 
+        from_date, 
+        to_date, 
+        hall_id: hall_id === 'all' ? undefined : hall_id 
+      } 
+    }).then(res => res.data),
   availability: (
     hall_id: number,
     event_date: string,
