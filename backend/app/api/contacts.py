@@ -54,6 +54,7 @@ async def create_contact(
     contact = Contact(**data.model_dump())
     db.add(contact)
     await db.flush()
+    await db.commit()
     await db.refresh(contact)
     return contact
 
@@ -72,6 +73,7 @@ async def update_contact(
     for k, v in data.model_dump(exclude_unset=True).items():
         setattr(contact, k, v)
     await db.flush()
+    await db.commit()
     await db.refresh(contact)
     return contact
 
@@ -88,3 +90,4 @@ async def delete_contact(
         raise HTTPException(status_code=404, detail="Contact not found")
     await db.delete(contact)
     await db.flush()
+    await db.commit()

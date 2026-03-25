@@ -52,6 +52,7 @@ async def create_task(
     )
     db.add(task)
     await db.flush()
+    await db.commit()
     await db.refresh(task)
     return task
 
@@ -70,6 +71,7 @@ async def update_task(
     for k, v in data.model_dump(exclude_unset=True).items():
         setattr(task, k, v)
     await db.flush()
+    await db.commit()
     await db.refresh(task)
     return task
 
@@ -86,3 +88,4 @@ async def delete_task(
         raise HTTPException(status_code=404, detail="Task not found")
     await db.delete(task)
     await db.flush()
+    await db.commit()

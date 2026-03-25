@@ -89,6 +89,7 @@ async def create_deal(
             description=f"Аренда зала, сделка #{deal.id}",
         )
         db.add(inv)
+    await db.commit()
     await db.refresh(deal)
     result = await db.execute(select(Deal).where(Deal.id == deal.id).options(selectinload(Deal.stage), selectinload(Deal.contact), selectinload(Deal.extra_tasks)))
     return result.scalar_one()
@@ -108,6 +109,7 @@ async def update_deal(
     for k, v in data.model_dump(exclude_unset=True).items():
         setattr(deal, k, v)
     await db.flush()
+    await db.commit()
     await db.refresh(deal)
     return deal
 
@@ -133,6 +135,7 @@ async def move_deal_stage(
             contact.total_events_count = (contact.total_events_count or 0) + 1
             contact.total_amount = (contact.total_amount or 0) + float(deal.rental_price)
     await db.flush()
+    await db.commit()
     return {"ok": True, "stage_id": stage_id}
 
 
@@ -154,5 +157,6 @@ async def create_invoice(
     )
     db.add(inv)
     await db.flush()
+    await db.commit()
     await db.refresh(inv)
     return {"id": inv.id, "number": inv.number, "amount": float(inv.amount)}

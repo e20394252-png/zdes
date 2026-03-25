@@ -42,6 +42,7 @@ async def confirm_authorized(db: AsyncSession = Depends(get_db), user: User = De
         await db.flush()
     cfg.is_authorized = True
     await db.flush()
+    await db.commit()
     return {"ok": True}
 
 
@@ -56,6 +57,7 @@ async def telethon_logout(db: AsyncSession = Depends(get_db), user: User = Depen
         if cfg:
             cfg.is_authorized = False
             await db.flush()
+            await db.commit()
         return {"ok": True}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
