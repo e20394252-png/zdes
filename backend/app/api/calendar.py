@@ -50,6 +50,7 @@ async def get_slots(
     debug_log(f"Fetching slots from={from_date} to={to_date} hall={hall_id}")
     deals_result = await db.execute(q2)
     deals = list(deals_result.scalars().all())
+    debug_log(f"DB Query returned {len(deals)} deals. Halls in memory: {len(halls)}")
 
     slots: list[Slot] = []
     for d in deals:
@@ -68,6 +69,12 @@ async def get_slots(
                         is_confirmed=d.deposit_paid,
                     )
                 )
+            else:
+                debug_log(f"WARN: Deal {d.id} has hall_id={d.hall_id} but hall not found or inactive!")
+        else:
+            debug_log(f"WARN: Deal {d.id} missing critical data: hall={d.hall_id}, date={d.event_date}, time={d.event_time_start}")
+
+    debug_log(f"Returning {len(slots)} slots to frontend.")
     return {"slots": [s.model_dump() for s in slots], "halls": [{"id": h.id, "name": h.name} for h in halls]}
 
 
