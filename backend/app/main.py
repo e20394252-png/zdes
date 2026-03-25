@@ -37,13 +37,15 @@ async def health():
         async with engine.connect() as conn:
             await conn.execute(text("SELECT 1"))
     except Exception as e:
-        print(f"HEALTH CHECK FAILURE: {e}")
+        error_msg = str(e)
+        print(f"HEALTH CHECK FAILURE: {error_msg}")
         resilient_mode = True
         
     return {
         "status": "ok" if not resilient_mode else "degraded", 
         "message": "Production server is LIVE",
-        "resilient_mode": resilient_mode
+        "resilient_mode": resilient_mode,
+        "error": error_msg if resilient_mode else None
     }
 
 @app.get("/api/health/postgres")
