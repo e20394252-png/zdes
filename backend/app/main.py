@@ -33,6 +33,7 @@ async def health():
     """Health check that reflects real DB status."""
     engine = get_engine()
     resilient_mode = False
+    error_msg = None
     try:
         async with engine.connect() as conn:
             await conn.execute(text("SELECT 1"))
