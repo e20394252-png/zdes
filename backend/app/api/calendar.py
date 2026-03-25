@@ -54,9 +54,11 @@ async def get_slots(
 
     slots: list[Slot] = []
     for d in deals:
+        debug_log(f"Processing deal {d.id}: hall={d.hall_id}, date={d.event_date}, time={d.event_time_start}")
         if d.hall_id and d.event_date and d.event_time_start and d.event_time_end:
             hall = next((h for h in halls if h.id == d.hall_id), None)
             if hall:
+                debug_log(f"Match found for deal {d.id} with hall {hall.name}")
                 slots.append(
                     Slot(
                         hall_id=hall.id,
