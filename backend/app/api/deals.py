@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 from app.database import get_db
-from app.api.settings import debug_log
+from app.core.logging import debug_log
 from app.models.deal import Deal, DealTask
 from app.models.contact import Contact
 from app.models.funnel import FunnelStage

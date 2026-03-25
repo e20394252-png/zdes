@@ -60,7 +60,7 @@ class RescueSession:
         try:
             return await self.real_session.execute(*args, **kwargs)
         except Exception as e:
-            from app.api.settings import debug_log
+            from app.core.logging import debug_log
             debug_log(f"RESCUE: Intercepted DB error during execute: {e}")
             self.is_failed = True
             return MockResult()
@@ -73,7 +73,7 @@ class RescueSession:
         try:
             await self.real_session.commit()
         except Exception as e:
-            from app.api.settings import debug_log
+            from app.core.logging import debug_log
             debug_log(f"RESCUE: Intercepted DB error during commit: {e}")
             self.is_failed = True
 
@@ -92,7 +92,7 @@ class RescueSession:
         try:
             await self.real_session.refresh(instance, *args, **kwargs)
         except Exception as e:
-            from app.api.settings import debug_log
+            from app.core.logging import debug_log
             debug_log(f"RESCUE: Intercepted DB error during refresh: {e}")
             self.is_failed = True
 
@@ -101,7 +101,7 @@ class RescueSession:
         try:
             self.real_session.add(instance, *args, **kwargs)
         except Exception as e:
-            from app.api.settings import debug_log
+            from app.core.logging import debug_log
             debug_log(f"RESCUE: Intercepted DB error during add: {e}")
             self.is_failed = True
     def __getattr__(self, name):
@@ -118,7 +118,7 @@ async def get_db():
         yielded = True
         yield RescueSession(session)
     except Exception as e:
-        from app.api.settings import debug_log
+        from app.core.logging import debug_log
         debug_log(f"RESCUE: DB error in generator: {e}")
         if not yielded:
             yield RescueSession(None)

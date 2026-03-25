@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_
 from app.database import get_db
-from app.api.settings import debug_log
+from app.core.logging import debug_log
 from app.models.deal import Deal
 from app.models.hall import Hall
 from app.core.deps import require_user
