@@ -25,7 +25,15 @@ app.add_middleware(
 )
 
 from sqlalchemy import text
-from app.database import get_db, get_engine, RescueSession
+from app.database import get_db, get_engine, RescueSession, create_tables
+from app.seed import seed
+
+@app.on_event("startup")
+async def on_startup():
+    print("STARTUP: Initializing database...")
+    await create_tables()
+    await seed()
+    print("STARTUP: Database initialized.")
 
 @app.get("/health")
 @app.get("/api/health")

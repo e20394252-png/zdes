@@ -31,6 +31,12 @@ def get_sessionmaker():
 class Base(DeclarativeBase):
     pass
 
+async def create_tables():
+    from app.models import User # Ensure models are loaded for metadata
+    engine = get_engine()
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
 # --- FAILOVER SYSTEM ---
 class MockResult:
     def scalars(self): 
