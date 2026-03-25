@@ -72,7 +72,7 @@ export default function HallCalendar() {
   useEffect(() => {
     const from = format(monthStart, 'yyyy-MM-dd')
     const to = format(monthEnd, 'yyyy-MM-dd')
-    calendar.slots(from, to, hallId).then((r) => setSlots(r.data.slots || []))
+    calendar.slots(from, to, hallId).then((r) => setSlots(r.slots || []))
   }, [current, hallId])
 
   useEffect(() => {
@@ -130,7 +130,7 @@ export default function HallCalendar() {
   async function handleCreateClient() {
     if (!newClient.name) return
     try {
-      const { data } = await contacts.create(newClient)
+      const data = await contacts.create(newClient)
       setContactsList((prev) => [data, ...prev])
       setBookForm((f) => ({ ...f, contact_id: data.id }))
       setNewClient({ name: '', phone: '', telegram_username: '' })

@@ -26,7 +26,7 @@ export default function Tasks() {
     const params: { is_done?: boolean } = {}
     if (filter === 'active') params.is_done = false
     if (filter === 'done') params.is_done = true
-    tasksApi.list(params).then((r) => setList(r.data))
+    tasksApi.list(params).then((r) => setList(r))
   }
 
   useEffect(() => {

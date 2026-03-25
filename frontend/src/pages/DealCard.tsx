@@ -55,19 +55,19 @@ export default function DealCard() {
   })
 
   useEffect(() => {
-    contacts.list({ limit: 500 }).then((r) => setContactsList(r.data))
-    settings.halls().then((r) => setHalls(r.data))
+    contacts.list({ limit: 500 }).then((r) => setContactsList(r))
+    settings.halls().then((r) => setHalls(r))
     settings.funnels().then((r) => {
-      setFunnels(r.data)
-      if (r.data[0]?.stages?.length && isNew)
-        setForm((f) => ({ ...f, stage_id: r.data[0].stages[0].id }))
+      setFunnels(r)
+      if (r[0]?.stages?.length && isNew)
+        setForm((f) => ({ ...f, stage_id: r[0].stages[0].id }))
     })
   }, [isNew])
 
   useEffect(() => {
     if (!isNew && id) {
       deals.get(Number(id)).then((r) => {
-        const d = r.data
+        const d = r
         setDeal(d)
         setForm({
           title: d.title,
@@ -108,7 +108,7 @@ export default function DealCard() {
         comments: form.comments || null,
       }
       if (isNew) {
-        const { data } = await deals.create(payload)
+        const data = await deals.create(payload)
         navigate(`/deals/${data.id}`)
       } else {
         await deals.update(Number(id), {
@@ -173,7 +173,7 @@ export default function DealCard() {
                   <button type="button" onClick={async () => {
                     if (!newClient.name) return
                     try {
-                      const { data } = await contacts.create(newClient)
+                      const data = await contacts.create(newClient)
                       setContactsList((prev) => [data, ...prev])
                       setForm((f) => ({ ...f, contact_id: data.id }))
                       setNewClient({ name: '', phone: '', telegram_username: '' })

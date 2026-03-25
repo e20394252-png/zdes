@@ -26,7 +26,7 @@ export default function Dashboard() {
   const [days, setDays] = useState(30)
 
   useEffect(() => {
-    dashboard.stats(days).then((r) => setStats(r.data))
+    dashboard.stats(days).then((r) => setStats(r))
   }, [days])
 
   if (!stats) {
