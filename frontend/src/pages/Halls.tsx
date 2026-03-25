@@ -130,7 +130,7 @@ export default function Halls() {
         <div className="pt-4 border-t border-slate-100">
           <p className="text-xs text-slate-500 mb-3 leading-relaxed">
             Если вы нажали «Обновить» и увидели белую страницу «Not Found», вернитесь на главную:
-            <a href="/" className="ml-1 text-indigo-600 font-bold hover:underline">Вернуться в Дашборд</a>
+            <a href="/" className="ml-1 text-indigo-600 font-bold hover:underline">На главную страницу</a>
           </p>
           <p className="text-xs text-slate-600 mb-2 font-medium">Введите адрес бэкенда вручную (из Dashboard Render):</p>
           <div className="flex gap-2">
@@ -161,7 +161,7 @@ export default function Halls() {
 
       <div className="flex justify-center gap-4">
         <button 
-          onClick={() => window.location.reload()}
+          onClick={() => loadHalls()}
           className="px-6 py-2.5 bg-red-600 text-white rounded-xl text-sm font-semibold hover:bg-red-700 shadow-md transition-all active:scale-95"
         >
           Попробовать еще раз

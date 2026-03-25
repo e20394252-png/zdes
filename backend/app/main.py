@@ -45,8 +45,7 @@ async def health():
     return {
         "status": "ok" if not resilient_mode else "degraded", 
         "message": "Production server is LIVE",
-        "resilient_mode": resilient_mode,
-        "error": error_msg if resilient_mode else None
+        "resilient_mode": resilient_mode
     }
 
 @app.get("/api/health/postgres")
