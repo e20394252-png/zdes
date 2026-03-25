@@ -17,6 +17,8 @@ from pydantic import BaseModel
 from datetime import datetime
 import collections
 
+from app.models.deal import Deal
+
 DEBUG_LOGS = collections.deque(maxlen=100)
 
 def debug_log(msg: str):
@@ -26,6 +28,28 @@ def debug_log(msg: str):
     DEBUG_LOGS.append(full_msg)
 
 router = APIRouter(prefix="/settings", tags=["settings"])
+
+@router.get("/debug-db-dump")
+async def db_dump(db: AsyncSession = Depends(get_db)):
+    from sqlalchemy import text
+    try:
+        res = await db.execute(select(Deal))
+        deals = res.scalars().all()
+        return {
+            "deals_count": len(deals),
+            "deals": [
+                {
+                    "id": d.id,
+                    "title": d.title,
+                    "date": d.event_date.isoformat() if d.event_date else None,
+                    "hall_id": d.hall_id,
+                    "deleted": False # placeholder
+                }
+                for d in deals
+            ]
+        }
+    except Exception as e:
+        return {"error": str(e)}
 
 @router.get("/debug-logs")
 async def get_debug_logs():
