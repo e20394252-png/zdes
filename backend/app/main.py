@@ -75,8 +75,24 @@ async def check_postgres():
 @app.get("/api/health/diagnostics")
 async def full_diagnostics():
     """System-wide health check including environment."""
+    from app.config import get_settings
+    settings = get_settings()
+    url = settings.sqlalchemy_database_url
+    
+    # Mask URL for security
+    masked_url = "None"
+    if url:
+        if "@" in url:
+            prefix, rest = url.split("@", 1)
+            masked_url = f"{prefix.split(':')[0]}://***:***@{rest.split(':')[0]}..."
+        else:
+            masked_url = url
+            
     return {
-        "database_url_configured": bool(os.getenv("DATABASE_URL") or os.getenv("RENDER_POSTGRES_INTERNAL_URL")),
+        "database_url_configured": bool(url),
+        "database_url_masked": masked_url,
+        "is_sqlite": "sqlite" in url.lower() if url else False,
+        "is_postgres": "postgres" in url.lower() if url else False,
         "database_url_type": "internal" if os.getenv("RENDER_POSTGRES_INTERNAL_URL") else "external",
         "env_stage": os.getenv("RENDER_EXTERNAL_HOSTNAME", "local"),
     }
