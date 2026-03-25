@@ -12,6 +12,7 @@ import {
   Cell,
   Legend,
 } from 'recharts'
+import WeeklyOccupancy from '../components/WeeklyOccupancy'
 
 export default function Dashboard() {
   const [stats, setStats] = useState<{
@@ -57,6 +58,8 @@ export default function Dashboard() {
           <option value={90}>За 90 дней</option>
         </select>
       </div>
+
+      <WeeklyOccupancy />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">

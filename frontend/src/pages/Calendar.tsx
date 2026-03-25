@@ -68,7 +68,7 @@ export default function Calendar() {
     const from = format(monthStart, 'yyyy-MM-dd')
     const to = format(monthEnd, 'yyyy-MM-dd')
     calendar.slots(from, to, selectedHall ?? undefined).then((r) => {
-      setSlots(r.data.slots || [])
+      setSlots(r.slots || [])
     })
   }, [current, selectedHall])
 
@@ -162,7 +162,7 @@ export default function Calendar() {
       const from = format(monthStart, 'yyyy-MM-dd')
       const to = format(monthEnd, 'yyyy-MM-dd')
       const r = await calendar.slots(from, to, selectedHall ?? undefined)
-      setSlots(r.data.slots || [])
+      setSlots(r.slots || [])
     } catch (_) {}
     setSaving(false)
   }
