@@ -15,7 +15,8 @@ export default function Contacts() {
   const [list, setList] = useState<Contact[]>([])
   const [search, setSearch] = useState('')
   const [loading, setLoading] = useState(true)
-  const [showCreate, setShowCreate] = useState(false)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingContact, setEditingContact] = useState<Contact | null>(null)
   const [saving, setSaving] = useState(false)
   const [form, setForm] = useState({
     name: '',
@@ -37,19 +38,42 @@ export default function Contacts() {
     load()
   }, [search])
 
-  const handleCreate = async (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault()
     setSaving(true)
     try {
-      await contactsApi.create(form)
-      setShowCreate(false)
+      if (editingContact) {
+        await contactsApi.update(editingContact.id, form)
+      } else {
+        await contactsApi.create(form)
+      }
+      setIsModalOpen(false)
+      setEditingContact(null)
       setForm({ name: '', company: '', phone: '', email: '', telegram_username: '' })
       load()
     } catch (err: any) {
-      alert(err.message || 'Ошибка при создании контакта')
+      alert(err.message || 'Ошибка при сохранении контакта')
     } finally {
       setSaving(false)
     }
+  }
+
+  const openCreateModal = () => {
+    setEditingContact(null)
+    setForm({ name: '', company: '', phone: '', email: '', telegram_username: '' })
+    setIsModalOpen(true)
+  }
+
+  const openEditModal = (contact: Contact) => {
+    setEditingContact(contact)
+    setForm({
+      name: contact.name,
+      company: contact.company || '',
+      phone: contact.phone || '',
+      email: contact.email || '',
+      telegram_username: (contact as any).telegram_username || ''
+    })
+    setIsModalOpen(true)
   }
 
   return (
@@ -64,21 +88,21 @@ export default function Contacts() {
           className="flex-1 px-3 py-2 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-primary-500"
         />
         <button 
-          onClick={() => setShowCreate(true)}
+          onClick={openCreateModal}
           className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition"
         >
           + Новый контакт
         </button>
       </div>
 
-      {showCreate && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" onClick={() => setShowCreate(false)}>
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" onClick={() => setIsModalOpen(false)}>
           <div className="bg-white rounded-2xl shadow-xl max-w-md w-full" onClick={(e) => e.stopPropagation()}>
             <div className="p-5 border-b border-slate-200 flex items-center justify-between">
-              <h2 className="text-lg font-semibold">Новый контакт</h2>
-              <button onClick={() => setShowCreate(false)} className="text-slate-400 hover:text-slate-600 text-xl">✕</button>
+              <h2 className="text-lg font-semibold">{editingContact ? 'Редактировать контакт' : 'Новый контакт'}</h2>
+              <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600 text-xl">✕</button>
             </div>
-            <form onSubmit={handleCreate} className="p-5 space-y-4">
+            <form onSubmit={handleSave} className="p-5 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Имя *</label>
                 <input required value={form.name} onChange={e => setForm({...form, name: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
@@ -102,7 +126,7 @@ export default function Contacts() {
                 <input value={form.telegram_username} onChange={e => setForm({...form, telegram_username: e.target.value})} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" placeholder="@username" />
               </div>
               <button type="submit" disabled={saving} className="w-full py-2.5 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 disabled:opacity-50">
-                {saving ? 'Сохранение...' : 'Создать'}
+                {saving ? 'Сохранение...' : editingContact ? 'Сохранить' : 'Создать'}
               </button>
             </form>
           </div>
@@ -125,7 +149,7 @@ export default function Contacts() {
               </thead>
               <tbody>
                 {list.map((c) => (
-                  <tr key={c.id} className="border-b border-slate-100 hover:bg-slate-50/50">
+                  <tr key={c.id} onClick={() => openEditModal(c)} className="border-b border-slate-100 hover:bg-slate-50/50 cursor-pointer">
                     <td className="py-3 px-4 font-medium text-slate-800">{c.name}</td>
                     <td className="py-3 px-4 text-slate-600">{c.company || '—'}</td>
                     <td className="py-3 px-4 text-slate-600">
