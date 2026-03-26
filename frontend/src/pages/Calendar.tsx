@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, isToday } from 'date-fns'
 import { ru } from 'date-fns/locale'
 import { calendar, settings, deals, contacts } from '../api/client'
@@ -27,6 +28,7 @@ const HALL_COLORS: Record<string, string> = {
 }
 
 export default function Calendar() {
+  const navigate = useNavigate()
   const [current, setCurrent] = useState(new Date())
   const [slots, setSlots] = useState<Slot[]>([])
   const [halls, setHalls] = useState<Hall[]>([])
@@ -217,8 +219,19 @@ export default function Calendar() {
                 <div className="mt-1 space-y-0.5">
                   {ds.slice(0, 3).map((s, i) => {
                     const c = getHallColor(s.hall_name)
+                    const isDeal = !!s.deal_id
                     return (
-                      <div key={i} className="text-xs truncate px-1 py-0.5 rounded" style={{ backgroundColor: c + '20', color: c }}>
+                      <div 
+                        key={i} 
+                        onClick={(e) => {
+                          if (s.deal_id) {
+                            e.stopPropagation()
+                            navigate(`/deals/${s.deal_id}`)
+                          }
+                        }}
+                        className={`text-xs truncate px-1 py-0.5 rounded ${isDeal ? 'cursor-pointer hover:opacity-80' : ''}`} 
+                        style={{ backgroundColor: c + '20', color: c }}
+                      >
                         {s.time_start.slice(0, 5)} {s.hall_name}
                       </div>
                     )
@@ -266,8 +279,19 @@ export default function Calendar() {
                       <div className="flex flex-wrap gap-1">
                         {busy.map((s, i) => {
                           const c = getHallColor(s.hall_name)
+                          const isDeal = !!s.deal_id
                           return (
-                            <span key={i} className="px-2 py-0.5 rounded text-xs font-medium" style={{ backgroundColor: c + '15', color: c, borderLeft: `2px solid ${c}` }}>
+                            <span 
+                              key={i} 
+                              onClick={(e) => {
+                                if (s.deal_id) {
+                                  e.stopPropagation()
+                                  navigate(`/deals/${s.deal_id}`)
+                                }
+                              }}
+                              className={`px-2 py-0.5 rounded text-xs font-medium ${isDeal ? 'cursor-pointer hover:opacity-80' : ''}`} 
+                              style={{ backgroundColor: c + '15', color: c, borderLeft: `2px solid ${c}` }}
+                            >
                               {s.hall_name}: {s.deal_title || 'Бронь'}
                             </span>
                           )

@@ -218,11 +218,24 @@ export default function HallCalendar() {
                 </p>
                 {hasBookings ? (
                   <div className="mt-1 space-y-0.5">
-                    {ds.slice(0, 3).map((s, i) => (
-                      <div key={i} className="text-xs truncate px-1 py-0.5 rounded" style={{ backgroundColor: color + '20', color }}>
-                        {s.time_start.slice(0, 5)}–{s.time_end.slice(0, 5)}
-                      </div>
-                    ))}
+                    {ds.slice(0, 3).map((s, i) => {
+                      const isDeal = !!s.deal_id
+                      return (
+                        <div 
+                          key={i} 
+                          onClick={(e) => {
+                            if (s.deal_id) {
+                              e.stopPropagation()
+                              navigate(`/deals/${s.deal_id}`)
+                            }
+                          }}
+                          className={`text-xs truncate px-1 py-0.5 rounded ${isDeal ? 'cursor-pointer hover:opacity-80' : ''}`} 
+                          style={{ backgroundColor: color + '20', color }}
+                        >
+                          {s.time_start.slice(0, 5)}–{s.time_end.slice(0, 5)}
+                        </div>
+                      )
+                    })}
                     {ds.length > 3 && <p className="text-xs text-slate-500">+{ds.length - 3}</p>}
                   </div>
                 ) : (
@@ -258,7 +271,18 @@ export default function HallCalendar() {
                   >
                     <span className="font-mono w-12 shrink-0 text-slate-500">{t}</span>
                     {busy ? (
-                      <span className="font-medium" style={{ color }}>{busy.deal_title || 'Бронь'} ({busy.time_start.slice(0, 5)}–{busy.time_end.slice(0, 5)})</span>
+                      <span 
+                        onClick={(e) => {
+                          if (busy.deal_id) {
+                            e.stopPropagation()
+                            navigate(`/deals/${busy.deal_id}`)
+                          }
+                        }}
+                        className={`font-medium ${busy.deal_id ? 'cursor-pointer hover:underline' : ''}`} 
+                        style={{ color }}
+                      >
+                        {busy.deal_title || 'Бронь'} ({busy.time_start.slice(0, 5)}–{busy.time_end.slice(0, 5)})
+                      </span>
                     ) : (
                       <div className="flex items-center justify-between flex-1">
                         <span className="text-slate-400 group-hover:text-primary-600">свободно</span>
