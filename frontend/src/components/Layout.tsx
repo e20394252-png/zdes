@@ -26,10 +26,7 @@ function HealthIndicator() {
 
 const nav = [
   { to: '/', label: 'Дашборд' },
-  { to: '/deals', label: 'Сделки' },
   { to: '/contacts', label: 'Контакты' },
-  { to: '/tasks', label: 'Задачи' },
-  { to: '/halls', label: 'Залы' },
   { to: '/calendar', label: 'Календарь' },
   { to: '/settings', label: 'Настройки' },
 ]
