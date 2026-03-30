@@ -52,8 +52,7 @@ export default function Calendar() {
   })
   const [newClient, setNewClient] = useState({ name: '', phone: '', telegram_username: '' })
   const [showNewClient, setShowNewClient] = useState(false)
-  const [newHall, setNewHall] = useState({ name: '', description: '', default_price: 0 })
-  const [showNewHall, setShowNewHall] = useState(false)
+
   const [saving, setSaving] = useState(false)
 
   const monthStart = startOfMonth(current)
@@ -131,16 +130,7 @@ export default function Calendar() {
     } catch (_) {}
   }
 
-  async function handleCreateHall() {
-    if (!newHall.name) return
-    try {
-      const data = await settings.createHall(newHall)
-      setHalls((prev) => [...prev, data])
-      setBookForm((f) => ({ ...f, hall_id: data.id }))
-      setNewHall({ name: '', description: '', default_price: 0 })
-      setShowNewHall(false)
-    } catch (_) {}
-  }
+
 
   async function handleBook(e: React.FormEvent) {
     e.preventDefault()
