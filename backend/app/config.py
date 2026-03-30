@@ -30,24 +30,31 @@ class Settings(BaseSettings):
         if not url:
             return ""
             
-        # Ensure asyncpg driver
-        if url.startswith("postgresql://"):
-            url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
-        elif url.startswith("postgres://"):
-            url = url.replace("postgres://", "postgresql+asyncpg://", 1)
-        elif not url.startswith("postgresql+asyncpg://"):
-            url = f"postgresql+asyncpg://{url}"
-
-        # PORT INJECTION: If host exists but no port, add :5432
-        # Example: postgresql+asyncpg://user:pass@dpg-xxx-a/db
-        if "@" in url and "/" in url.split("@")[1] and ":" not in url.split("@")[1].split("/")[0]:
-            parts = url.split("@")
-            host_part = parts[1].split("/")
-            host_part[0] = f"{host_part[0]}:5432"
-            parts[1] = "/".join(host_part)
-            url = "@".join(parts)
+        url = url.strip()
             
-        return url
+        from sqlalchemy.engine.url import make_url
+        try:
+            parsed = make_url(url)
+            
+            # Ensure asyncpg driver
+            if parsed.drivername in ("postgres", "postgresql"):
+                parsed = parsed.set(drivername="postgresql+asyncpg")
+                
+            # Ensure port is set if missing
+            if parsed.port is None and parsed.host:
+                parsed = parsed.set(port=5432)
+                
+            return parsed.render_as_string(hide_password=False)
+        except Exception:
+            # Fallback to string manipulation if parsing fails for some reason
+            if url.startswith("postgresql://"):
+                url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+            elif url.startswith("postgres://"):
+                url = url.replace("postgres://", "postgresql+asyncpg://", 1)
+            elif not url.startswith("postgresql+asyncpg://"):
+                # Handle generic cases safely
+                url = f"postgresql+asyncpg://{url.split('://', 1)[-1]}" if "://" in url else f"postgresql+asyncpg://{url}"
+            return url
 
     @property
     def redis_url_transformed(self) -> str:
