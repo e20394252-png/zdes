@@ -97,7 +97,7 @@ export default function DealCard() {
         contact_id: form.contact_id,
         stage_id: form.stage_id,
         funnel_id: currentFunnel?.id ?? funnels[0]?.id ?? 1,
-        hall_id: form.hall_id,
+        hall_id: form.hall_id || (halls.length > 0 ? halls[0].id : null),
         event_date: form.event_date || null,
         event_time_start: form.event_time_start || null,
         event_time_end: form.event_time_end || null,
@@ -207,19 +207,7 @@ export default function DealCard() {
               </select>
             </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Зал</label>
-            <select
-              value={form.hall_id ?? ''}
-              onChange={(e) => setForm((f) => ({ ...f, hall_id: e.target.value ? Number(e.target.value) : null }))}
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg"
-            >
-              <option value="">— Не выбран —</option>
-              {halls.map((h) => (
-                <option key={h.id} value={h.id}>{h.name}</option>
-              ))}
-            </select>
-          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 mb-1">Дата мероприятия</label>

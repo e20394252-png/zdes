@@ -109,7 +109,7 @@ export default function Calendar() {
     setBookForm({
       title: '',
       contact_id: null,
-      hall_id: hId !== undefined ? hId : selectedHall,
+      hall_id: hId !== undefined ? hId : (selectedHall !== null ? selectedHall : (halls.length > 0 ? halls[0].id : null)),
       event_date: dateStr,
       event_time_start: startTime || '',
       event_time_end: endTime,
@@ -350,26 +350,7 @@ export default function Calendar() {
                   </select>
                 )}
               </div>
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-sm font-medium text-slate-700">Зал</label>
-                  <button type="button" onClick={() => setShowNewHall(!showNewHall)} className="text-xs text-primary-600 hover:underline">
-                    {showNewHall ? 'Отмена' : '+ Создать зал'}
-                  </button>
-                </div>
-                {showNewHall ? (
-                  <div className="space-y-2 p-3 bg-slate-50 rounded-lg border border-slate-200">
-                    <input placeholder="Название зала *" value={newHall.name} onChange={(e) => setNewHall((h) => ({ ...h, name: e.target.value }))} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
-                    <input placeholder="Цена по умолчанию" type="number" value={newHall.default_price || ''} onChange={(e) => setNewHall((h) => ({ ...h, default_price: Number(e.target.value) || 0 }))} className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
-                    <button type="button" onClick={handleCreateHall} className="px-3 py-1.5 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-500">Добавить</button>
-                  </div>
-                ) : (
-                  <select value={bookForm.hall_id ?? ''} onChange={(e) => setBookForm((f) => ({ ...f, hall_id: e.target.value ? Number(e.target.value) : null }))} className="w-full px-3 py-2 border border-slate-300 rounded-lg">
-                    <option value="">— Выберите зал —</option>
-                    {halls.map((h) => (<option key={h.id} value={h.id}>{h.name}</option>))}
-                  </select>
-                )}
-              </div>
+
               <div className="grid grid-cols-3 gap-3">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Дата</label>
