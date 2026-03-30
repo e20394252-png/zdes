@@ -31,9 +31,26 @@ from app.seed import seed
 @app.on_event("startup")
 async def on_startup():
     print("STARTUP: Initializing database...")
-    await create_tables()
-    await seed()
-    print("STARTUP: Database initialized.")
+    try:
+        from app.config import get_settings
+        settings = get_settings()
+        url = settings.sqlalchemy_database_url
+        
+        # Mask the URL for safe logging
+        masked_url = "None"
+        if url:
+            if "@" in url:
+                masked_url = url.split("://")[0] + "://***:***@" + url.split("@", 1)[1]
+            else:
+                masked_url = url
+        print(f"DEBUG: Attempting to connect to DB: {masked_url}")
+        
+        await create_tables()
+        await seed()
+        print("STARTUP: Database initialized successfully.")
+    except Exception as e:
+        print(f"STARTUP ERROR: Could not initialize database. Error: {e}")
+        print("WARNING: Application started, but database is NOT available. This usually means the Render Database is suspended, deleted, or the hostname is invalid in DATABASE_URL.")
 
 @app.get("/health")
 @app.get("/api/health")
