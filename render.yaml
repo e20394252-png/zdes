@@ -19,6 +19,7 @@ services:
     rootDir: backend
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    autoDeploy: true
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.8
@@ -47,6 +48,7 @@ services:
     rootDir: frontend
     buildCommand: npm install && npm run build
     staticPublishPath: ./dist
+    autoDeploy: true
     envVars:
       - key: VITE_API_URL
         fromService:
