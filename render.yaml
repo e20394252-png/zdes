@@ -51,7 +51,4 @@ services:
     autoDeploy: true
     envVars:
       - key: VITE_API_URL
-        fromService:
-          name: event-crm-backend
-          type: web
-          property: host
+        value: https://event-crm-backend.onrender.com
