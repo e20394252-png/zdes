@@ -52,3 +52,5 @@ services:
     envVars:
       - key: VITE_API_URL
         value: https://event-crm-backend.onrender.com
+
+version: "1"
