@@ -135,7 +135,7 @@ export default function DealCard() {
     <div className="max-w-3xl mx-auto space-y-6">
       <div className="flex items-center gap-4">
         <button
-          onClick={() => navigate('/deals')}
+          onClick={() => navigate(-1)}
           className="text-slate-600 hover:text-slate-800"
         >
           ← Назад

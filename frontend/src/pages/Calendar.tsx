@@ -164,7 +164,7 @@ export default function Calendar() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <h1 className="text-2xl font-semibold text-slate-800">Календарь залов</h1>
+          <h1 className="text-2xl font-semibold text-slate-800">Календарь зала</h1>
           <button
             onClick={() => navigate('/weekly-calendar')}
             className="rounded-lg border border-slate-300 text-sm py-1 px-3 hover:bg-slate-50 text-slate-600"
