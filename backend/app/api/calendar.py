@@ -2,13 +2,16 @@ from datetime import date, time, datetime
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, and_
+from sqlalchemy.orm import selectinload
 from app.database import get_db
 from app.core.logging import debug_log
 from app.models.deal import Deal
 from app.models.hall import Hall
+from app.models.contact import Contact
 from app.core.deps import require_user
 from app.models.user import User
 from pydantic import BaseModel
+from decimal import Decimal
 
 router = APIRouter(prefix="/calendar", tags=["calendar"])
 
@@ -22,6 +25,9 @@ class Slot(BaseModel):
     deal_id: int | None
     deal_title: str | None
     is_confirmed: bool  # deposit_paid
+    rental_price: float | None = None
+    contact_name: str | None = None
+    organizer_name: str | None = None
 
 
 @router.get("/slots")
@@ -39,7 +45,7 @@ async def get_slots(
     halls_result = await db.execute(q)
     halls = list(halls_result.scalars().all())
 
-    q2 = select(Deal).where(
+    q2 = select(Deal).options(selectinload(Deal.contact)).where(
         Deal.event_date >= from_date,
         Deal.event_date <= to_date,
         Deal.hall_id.isnot(None),
@@ -69,6 +75,9 @@ async def get_slots(
                         deal_id=d.id,
                         deal_title=d.title,
                         is_confirmed=d.deposit_paid,
+                        rental_price=float(d.rental_price) if d.rental_price else None,
+                        contact_name=d.contact.name if d.contact else None,
+                        organizer_name=d.event_organizer_name,
                     )
                 )
             else:

@@ -8,6 +8,7 @@ import Contacts from './pages/Contacts'
 // import Halls from './pages/Halls'
 import HallCalendar from './pages/HallCalendar'
 import Calendar from './pages/Calendar'
+import WeeklyCalendar from './pages/WeeklyCalendar'
 import Settings from './pages/Settings'
 
 import ErrorBoundary from './components/ErrorBoundary'
@@ -34,6 +35,7 @@ export default function App() {
         <Route path="halls" element={<Halls />} /> */}
         <Route path="halls/:id/calendar" element={<HallCalendar />} />
         <Route path="calendar" element={<Calendar />} />
+        <Route path="weekly-calendar" element={<WeeklyCalendar />} />
         <Route path="settings" element={<Settings />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
