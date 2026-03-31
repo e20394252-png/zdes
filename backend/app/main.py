@@ -1,6 +1,8 @@
 import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from app.api import api
 
 app = FastAPI(
@@ -116,6 +118,29 @@ async def full_diagnostics():
 
 # Include all real routes
 app.include_router(api, prefix="/api")
+
+# Serve React Frontend (SPA fallback routing)
+static_dir = os.path.join(os.path.dirname(__file__), "..", "static")
+if os.path.exists(static_dir):
+    assets_dir = os.path.join(static_dir, "assets")
+    if os.path.exists(assets_dir):
+        app.mount("/assets", StaticFiles(directory=assets_dir), name="assets")
+
+    @app.get("/{catchall:path}")
+    async def serve_spa(catchall: str):
+        # Don't intercept API routes (let normal 404 happen)
+        if catchall.startswith("api/"):
+            from fastapi import HTTPException
+            raise HTTPException(status_code=404, detail="API route not found")
+        
+        file_path = os.path.join(static_dir, catchall)
+        if os.path.isfile(file_path):
+            return FileResponse(file_path)
+            
+        index_file = os.path.join(static_dir, "index.html")
+        if os.path.exists(index_file):
+            return FileResponse(index_file)
+        return {"error": "Frontend not found"}, 404
 
 # Startup check (non-blocking)
 @app.on_event("startup")
