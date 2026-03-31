@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { settings, telethon } from '../api/client'
 
 type Funnel = { id: number; name: string; is_default: boolean; stages: { id: number; name: string; order: number }[] }
-type Hall = { id: number; name: string; default_price: number; is_active: boolean }
 type TelethonConfig = {
   is_authorized: boolean
   chat_id?: string
@@ -15,11 +14,10 @@ type TelethonConfig = {
 
 export default function Settings() {
   const [funnels, setFunnels] = useState<Funnel[]>([])
-  const [halls, setHalls] = useState<Hall[]>([])
   const [managers, setManagers] = useState<{ id: number; full_name: string; email: string }[]>([])
   const [telethonCfg, setTelethonCfg] = useState<TelethonConfig | null>(null)
   const [qrUrl, setQrUrl] = useState<string | null>(null)
-  const [tab, setTab] = useState<'funnels' | 'halls' | 'managers' | 'telethon'>('funnels')
+  const [tab, setTab] = useState<'funnels' | 'managers' | 'telethon'>('funnels')
   const [telethonForm, setTelethonForm] = useState({
     chat_id: '',
     keywords: '',
@@ -29,7 +27,6 @@ export default function Settings() {
 
   useEffect(() => {
     settings.funnels().then((r) => setFunnels(r))
-    settings.halls().then((r) => setHalls(r))
     settings.managers().then((r) => setManagers(r))
     settings.telethon().then((r) => {
       setTelethonCfg(r)
@@ -72,7 +69,6 @@ export default function Settings() {
 
   const tabs = [
     { id: 'funnels' as const, label: 'Воронки' },
-    { id: 'halls' as const, label: 'Залы и цены' },
     { id: 'managers' as const, label: 'Менеджеры' },
     { id: 'telethon' as const, label: 'Telegram (Telethon)' },
   ]
@@ -111,20 +107,6 @@ export default function Settings() {
                 {f.is_default && (
                   <span className="text-xs bg-primary-100 text-primary-700 px-2 py-0.5 rounded">По умолчанию</span>
                 )}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {tab === 'halls' && (
-        <div className="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
-          <h2 className="text-lg font-medium text-slate-800 mb-4">Залы</h2>
-          <ul className="space-y-3">
-            {halls.map((h) => (
-              <li key={h.id} className="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
-                <span className="font-medium text-slate-800">{h.name}</span>
-                <span className="text-slate-600">{Number(h.default_price).toLocaleString('ru-RU')} ₽</span>
               </li>
             ))}
           </ul>

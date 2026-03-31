@@ -7,6 +7,7 @@ type Contact = {
   company: string | null
   email: string | null
   phone: string | null
+  telegram_username: string | null
   total_events_count: number
   total_amount: number
 }
@@ -71,7 +72,7 @@ export default function Contacts() {
       company: contact.company || '',
       phone: contact.phone || '',
       email: contact.email || '',
-      telegram_username: (contact as any).telegram_username || ''
+      telegram_username: contact.telegram_username || ''
     })
     setIsModalOpen(true)
   }
@@ -143,6 +144,7 @@ export default function Contacts() {
                   <th className="text-left py-3 px-4 font-medium text-slate-700">Имя</th>
                   <th className="text-left py-3 px-4 font-medium text-slate-700">Компания</th>
                   <th className="text-left py-3 px-4 font-medium text-slate-700">Контакты</th>
+                  <th className="text-left py-3 px-4 font-medium text-slate-700">Telegram</th>
                   <th className="text-right py-3 px-4 font-medium text-slate-700">Мероприятий</th>
                   <th className="text-right py-3 px-4 font-medium text-slate-700">Сумма</th>
                 </tr>
@@ -154,6 +156,11 @@ export default function Contacts() {
                     <td className="py-3 px-4 text-slate-600">{c.company || '—'}</td>
                     <td className="py-3 px-4 text-slate-600">
                       {[c.email, c.phone].filter(Boolean).join(' • ') || '—'}
+                    </td>
+                    <td className="py-3 px-4 text-slate-600">
+                      {c.telegram_username ? (
+                        <span className="text-blue-600">@{c.telegram_username.replace(/^@/, '')}</span>
+                      ) : '—'}
                     </td>
                     <td className="py-3 px-4 text-right text-slate-700">{c.total_events_count}</td>
                     <td className="py-3 px-4 text-right font-medium text-slate-800">

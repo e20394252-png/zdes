@@ -179,45 +179,43 @@ export default function WeeklyCalendar() {
   }
 
   return (
-    <div style={{ background: '#0f1117', minHeight: '100vh', color: '#e2e8f0', fontFamily: "'Inter', sans-serif" }}>
+    <div className="space-y-4">
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 24px 12px', borderBottom: '1px solid #1e2433' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <h1 className="text-2xl font-semibold text-slate-800">Календарь залов</h1>
           <button
             onClick={() => navigate('/calendar')}
-            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#94a3b8', padding: '6px 14px', borderRadius: 8, cursor: 'pointer', fontSize: 13 }}
+            className="rounded-lg border border-slate-300 text-sm py-1 px-3 hover:bg-slate-50 text-slate-600"
           >
             📅 Месяц
           </button>
           <button
-            style={{ background: 'rgba(99,102,241,0.18)', border: '1px solid rgba(99,102,241,0.5)', color: '#818cf8', padding: '6px 14px', borderRadius: 8, cursor: 'pointer', fontSize: 13, fontWeight: 600 }}
+            style={{ background: '#e0e7ff', border: '1px solid #a5b4fc', color: '#4338ca', padding: '4px 12px', borderRadius: 8, fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
           >
             🗓 Неделя
           </button>
         </div>
 
-        <h2 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: '#f1f5f9', letterSpacing: '-0.3px' }}>
+        <h2 style={{ margin: 0, fontSize: 15, fontWeight: 600, color: '#475569' }}>
           {format(weekStart, 'd MMM', { locale: ru })} — {format(weekEnd, 'd MMM yyyy', { locale: ru })}
         </h2>
 
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button
-            onClick={() => setCurrent(subWeeks(current, 1))}
-            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#e2e8f0', width: 34, height: 34, borderRadius: 8, cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        <div style={{ display: 'flex', gap: 6 }}>
+          <button onClick={() => setCurrent(subWeeks(current, 1))}
+            className="p-2 rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-700"
           >‹</button>
-          <button
-            onClick={() => setCurrent(new Date())}
-            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#94a3b8', padding: '0 12px', height: 34, borderRadius: 8, cursor: 'pointer', fontSize: 12 }}
+          <button onClick={() => setCurrent(new Date())}
+            className="px-3 py-1 rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-600 text-sm"
           >Сегодня</button>
-          <button
-            onClick={() => setCurrent(addWeeks(current, 1))}
-            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', color: '#e2e8f0', width: 34, height: 34, borderRadius: 8, cursor: 'pointer', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          <button onClick={() => setCurrent(addWeeks(current, 1))}
+            className="p-2 rounded-lg border border-slate-300 hover:bg-slate-50 text-slate-700"
           >›</button>
         </div>
       </div>
 
       {/* Grid */}
-      <div style={{ overflowX: 'auto', padding: '0 24px 24px' }}>
+      <div style={{ overflowX: 'auto', padding: '0 0 24px', marginTop: 0 }}>
         <table style={{ borderCollapse: 'collapse', width: '100%', minWidth: 900, tableLayout: 'fixed' }}>
           <colgroup>
             <col style={{ width: 64 }} />
@@ -226,25 +224,25 @@ export default function WeeklyCalendar() {
           <thead>
             <tr>
               {/* Date header row */}
-              <th style={{ padding: '10px 4px', textAlign: 'center', fontWeight: 500, fontSize: 11, color: '#64748b', textTransform: 'uppercase', letterSpacing: 1, borderBottom: '1px solid #1e2433' }}></th>
+              <th style={{ padding: '10px 8px', textAlign: 'center', fontWeight: 500, fontSize: 11, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 1, borderBottom: '1px solid #e2e8f0', width: 56 }}></th>
               {days.map(day => {
                 const isToday = format(day, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd')
                 return (
-                  <th key={day.toISOString()} style={{ padding: '10px 4px', textAlign: 'center', fontWeight: 600, fontSize: 13, color: isToday ? '#818cf8' : '#94a3b8', borderBottom: '1px solid #1e2433', borderLeft: '1px solid #1e2433' }}>
-                    <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.5, fontWeight: 500, marginBottom: 2, color: isToday ? '#818cf8' : '#475569' }}>
+                  <th key={day.toISOString()} style={{ padding: '10px 4px', textAlign: 'center', fontWeight: 600, fontSize: 13, color: isToday ? '#4f46e5' : '#475569', borderBottom: '1px solid #e2e8f0', borderLeft: '1px solid #f1f5f9' }}>
+                    <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.5, fontWeight: 500, marginBottom: 2, color: isToday ? '#4f46e5' : '#94a3b8' }}>
                       {format(day, 'EEE', { locale: ru })}
                     </div>
                     <div style={{
                       display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
                       width: 28, height: 28, borderRadius: '50%',
                       background: isToday ? '#4f46e5' : 'transparent',
-                      color: isToday ? '#fff' : '#e2e8f0',
+                      color: isToday ? '#fff' : '#1e293b',
                       fontWeight: isToday ? 700 : 600,
                       fontSize: 15,
                     }}>
                       {format(day, 'd')}
                     </div>
-                    <div style={{ fontSize: 11, marginTop: 2, color: '#475569' }}>
+                    <div style={{ fontSize: 11, marginTop: 2, color: '#94a3b8' }}>
                       {format(day, 'MMM', { locale: ru })}
                     </div>
                   </th>
@@ -262,12 +260,13 @@ export default function WeeklyCalendar() {
                     padding: '0 8px 0 0',
                     textAlign: 'right',
                     fontSize: 11,
-                    color: '#475569',
+                    color: '#94a3b8',
                     fontWeight: 500,
                     verticalAlign: 'top',
                     paddingTop: 6,
-                    borderTop: '1px solid #1a2035',
+                    borderTop: '1px solid #f1f5f9',
                     whiteSpace: 'nowrap',
+                    width: 56,
                   }}>
                     {timeLabel}
                   </td>
@@ -287,9 +286,9 @@ export default function WeeklyCalendar() {
                         skipMap[`${dayStr}-${hour + s}`] = true
                       }
                       const confirmed = slot.is_confirmed
-                      const bg = confirmed ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.1)'
-                      const border = confirmed ? '1px solid rgba(34,197,94,0.3)' : '1px solid rgba(239,68,68,0.25)'
-                      const textColor = confirmed ? '#4ade80' : '#f87171'
+                      const bg = confirmed ? '#f0fdf4' : '#fff7f7'
+                      const border = confirmed ? '1px solid #bbf7d0' : '1px solid #fecaca'
+                      const textColor = confirmed ? '#16a34a' : '#dc2626'
 
                       return (
                         <td
@@ -306,19 +305,19 @@ export default function WeeklyCalendar() {
                             cursor: slot.deal_id ? 'pointer' : 'default',
                             transition: 'background 0.15s',
                           }}
-                          onMouseEnter={e => { if (slot.deal_id) (e.currentTarget as HTMLElement).style.background = confirmed ? 'rgba(34,197,94,0.22)' : 'rgba(239,68,68,0.18)' }}
+                          onMouseEnter={e => { if (slot.deal_id) (e.currentTarget as HTMLElement).style.background = confirmed ? '#dcfce7' : '#fee2e2' }}
                           onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = bg }}
                         >
                           <div style={{ fontSize: 11, fontWeight: 700, color: textColor, lineHeight: 1.3 }}>
                             {slot.time_start.slice(0, 5)} – {slot.time_end.slice(0, 5)}
                           </div>
                           {slot.contact_name && (
-                            <div style={{ fontSize: 11, fontWeight: 600, color: '#e2e8f0', marginTop: 2, textTransform: 'uppercase', letterSpacing: 0.3 }}>
+                            <div style={{ fontSize: 11, fontWeight: 600, color: '#1e293b', marginTop: 2, textTransform: 'uppercase', letterSpacing: 0.3 }}>
                               {slot.contact_name}
                             </div>
                           )}
                           {slot.deal_title && (
-                            <div style={{ fontSize: 10, color: '#94a3b8', marginTop: 1 }}>
+                            <div style={{ fontSize: 10, color: '#64748b', marginTop: 1 }}>
                               {slot.deal_title}
                             </div>
                           )}
@@ -338,13 +337,13 @@ export default function WeeklyCalendar() {
                         onClick={() => openBooking(dayStr, hour)}
                         style={{
                           background: 'transparent',
-                          borderTop: '1px solid #1a2035',
-                          borderLeft: '1px solid #1e2433',
+                          borderTop: '1px solid #f1f5f9',
+                          borderLeft: '1px solid #f1f5f9',
                           height: 42,
                           cursor: 'pointer',
                           transition: 'background 0.1s',
                         }}
-                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(99,102,241,0.07)' }}
+                        onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#f8fafc' }}
                         onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}
                       />
                     )
@@ -354,14 +353,14 @@ export default function WeeklyCalendar() {
             })}
             {/* Totals row */}
             <tr>
-              <td style={{ padding: '8px 8px 0 0', textAlign: 'right', fontSize: 10, color: '#475569', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5, borderTop: '2px solid #1e2433' }}>
+              <td style={{ padding: '8px 8px 0 0', textAlign: 'right', fontSize: 10, color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5, borderTop: '2px solid #e2e8f0' }}>
                 Итого
               </td>
               {days.map(day => {
                 const dayStr = format(day, 'yyyy-MM-dd')
                 const total = dayTotal(dayStr)
                 return (
-                  <td key={dayStr} style={{ padding: '8px 8px 0', textAlign: 'center', fontSize: 12, fontWeight: 700, color: total > 0 ? '#34d399' : '#334155', borderTop: '2px solid #1e2433', borderLeft: '1px solid #1e2433' }}>
+                  <td key={dayStr} style={{ padding: '8px 8px 0', textAlign: 'center', fontSize: 12, fontWeight: 700, color: total > 0 ? '#16a34a' : '#cbd5e1', borderTop: '2px solid #e2e8f0', borderLeft: '1px solid #f1f5f9' }}>
                     {total > 0 ? `${total.toLocaleString('ru')} ₽` : '—'}
                   </td>
                 )
@@ -373,28 +372,28 @@ export default function WeeklyCalendar() {
         {/* Week grand total */}
         <div style={{ textAlign: 'right', marginTop: 8, fontSize: 13, color: '#64748b' }}>
           Итог недели:{' '}
-          <span style={{ fontWeight: 700, fontSize: 15, color: '#34d399' }}>{weekTotal().toLocaleString('ru')} ₽</span>
+          <span style={{ fontWeight: 700, fontSize: 15, color: '#16a34a' }}>{weekTotal().toLocaleString('ru')} ₽</span>
         </div>
       </div>
 
       {/* Booking modal */}
       {showBooking && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, backdropFilter: 'blur(4px)' }}>
-          <div style={{ background: '#161b2e', border: '1px solid #2d3748', borderRadius: 16, padding: 28, width: 480, maxHeight: '90vh', overflowY: 'auto' }}>
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, backdropFilter: 'blur(2px)' }}>
+          <div style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: 16, padding: 28, width: 480, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.15)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-              <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#f1f5f9' }}>Новое бронирование</h3>
-              <button onClick={() => setShowBooking(false)} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: 20, lineHeight: 1 }}>×</button>
+              <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#1e293b' }}>Новое бронирование</h3>
+              <button onClick={() => setShowBooking(false)} style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: 20, lineHeight: 1 }}>×</button>
             </div>
             <form onSubmit={handleBook} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <div>
                 <label style={{ display: 'block', fontSize: 12, color: '#64748b', marginBottom: 4, fontWeight: 500 }}>Название</label>
                 <input required value={bookForm.title} onChange={e => setBookForm(f => ({ ...f, title: e.target.value }))}
-                  style={{ width: '100%', background: '#0f1117', border: '1px solid #2d3748', borderRadius: 8, color: '#f1f5f9', padding: '9px 12px', fontSize: 13, boxSizing: 'border-box' }} />
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: 12, color: '#64748b', marginBottom: 4, fontWeight: 500 }}>Клиент</label>
                 <select value={bookForm.contact_id ?? ''} onChange={e => setBookForm(f => ({ ...f, contact_id: e.target.value ? Number(e.target.value) : null }))}
-                  style={{ width: '100%', background: '#0f1117', border: '1px solid #2d3748', borderRadius: 8, color: bookForm.contact_id ? '#f1f5f9' : '#64748b', padding: '9px 12px', fontSize: 13, boxSizing: 'border-box' }}>
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm">
                   <option value="">— Выбрать клиента —</option>
                   {contactsList.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
@@ -417,38 +416,38 @@ export default function WeeklyCalendar() {
                 <div>
                   <label style={{ display: 'block', fontSize: 12, color: '#64748b', marginBottom: 4, fontWeight: 500 }}>Дата</label>
                   <input type="date" value={bookForm.event_date} onChange={e => setBookForm(f => ({ ...f, event_date: e.target.value }))}
-                    style={{ width: '100%', background: '#0f1117', border: '1px solid #2d3748', borderRadius: 8, color: '#f1f5f9', padding: '9px 12px', fontSize: 13, boxSizing: 'border-box' }} />
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: 12, color: '#64748b', marginBottom: 4, fontWeight: 500 }}>Цена (₽)</label>
                   <input type="number" value={bookForm.rental_price} onChange={e => setBookForm(f => ({ ...f, rental_price: Number(e.target.value) }))}
-                    style={{ width: '100%', background: '#0f1117', border: '1px solid #2d3748', borderRadius: 8, color: '#f1f5f9', padding: '9px 12px', fontSize: 13, boxSizing: 'border-box' }} />
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
                 </div>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                 <div>
                   <label style={{ display: 'block', fontSize: 12, color: '#64748b', marginBottom: 4, fontWeight: 500 }}>Начало</label>
                   <input type="time" value={bookForm.event_time_start} onChange={e => setBookForm(f => ({ ...f, event_time_start: e.target.value }))}
-                    style={{ width: '100%', background: '#0f1117', border: '1px solid #2d3748', borderRadius: 8, color: '#f1f5f9', padding: '9px 12px', fontSize: 13, boxSizing: 'border-box' }} />
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
                 </div>
                 <div>
                   <label style={{ display: 'block', fontSize: 12, color: '#64748b', marginBottom: 4, fontWeight: 500 }}>Конец</label>
                   <input type="time" value={bookForm.event_time_end} onChange={e => setBookForm(f => ({ ...f, event_time_end: e.target.value }))}
-                    style={{ width: '100%', background: '#0f1117', border: '1px solid #2d3748', borderRadius: 8, color: '#f1f5f9', padding: '9px 12px', fontSize: 13, boxSizing: 'border-box' }} />
+                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm" />
                 </div>
               </div>
               <div>
                 <label style={{ display: 'block', fontSize: 12, color: '#64748b', marginBottom: 4, fontWeight: 500 }}>Комментарий</label>
                 <textarea value={bookForm.comments} onChange={e => setBookForm(f => ({ ...f, comments: e.target.value }))} rows={2}
-                  style={{ width: '100%', background: '#0f1117', border: '1px solid #2d3748', borderRadius: 8, color: '#f1f5f9', padding: '9px 12px', fontSize: 13, resize: 'vertical', boxSizing: 'border-box' }} />
+                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm resize-y" />
               </div>
               <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
                 <button type="button" onClick={() => setShowBooking(false)}
-                  style={{ flex: 1, background: 'rgba(255,255,255,0.05)', border: '1px solid #2d3748', color: '#94a3b8', padding: '10px', borderRadius: 10, cursor: 'pointer', fontSize: 13 }}>
+                  className="flex-1 py-2.5 border border-slate-300 text-slate-600 rounded-xl text-sm hover:bg-slate-50">
                   Отмена
                 </button>
                 <button type="submit" disabled={saving}
-                  style={{ flex: 2, background: '#4f46e5', border: 'none', color: '#fff', padding: '10px', borderRadius: 10, cursor: 'pointer', fontSize: 13, fontWeight: 600, opacity: saving ? 0.6 : 1 }}>
+                  className="flex-[2] py-2.5 bg-primary-600 text-white rounded-xl text-sm font-semibold hover:bg-primary-700 disabled:opacity-50">
                   {saving ? 'Сохраняем...' : 'Создать бронирование'}
                 </button>
               </div>
