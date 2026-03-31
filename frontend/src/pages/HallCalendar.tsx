@@ -13,6 +13,7 @@ type Slot = {
   deal_id: number | null
   deal_title: string | null
   is_confirmed: boolean
+  contact_name: string | null
 }
 
 type Hall = { id: number; name: string; description?: string }
@@ -281,7 +282,7 @@ export default function HallCalendar() {
                         className={`font-medium ${busy.deal_id ? 'cursor-pointer hover:underline' : ''}`} 
                         style={{ color }}
                       >
-                        {busy.deal_title || 'Бронь'} ({busy.time_start.slice(0, 5)}–{busy.time_end.slice(0, 5)})
+                        {busy.contact_name ? `${busy.contact_name} ` : ''}{busy.deal_title ? `(${busy.deal_title})` : ''} ({busy.time_start.slice(0, 5)}–{busy.time_end.slice(0, 5)})
                       </span>
                     ) : (
                       <div className="flex items-center justify-between flex-1">

@@ -224,11 +224,11 @@ export default function WeeklyCalendar() {
           <thead>
             <tr>
               {/* Date header row */}
-              <th style={{ padding: '10px 8px', textAlign: 'center', fontWeight: 500, fontSize: 11, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 1, borderBottom: '1px solid #e2e8f0', width: 56 }}></th>
+              <th style={{ padding: '10px 8px', textAlign: 'center', fontWeight: 500, fontSize: 11, color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 1, borderBottom: '1px solid #cbd5e1', borderRight: '1px solid #cbd5e1', width: 56 }}></th>
               {days.map(day => {
                 const isToday = format(day, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd')
                 return (
-                  <th key={day.toISOString()} style={{ padding: '10px 4px', textAlign: 'center', fontWeight: 600, fontSize: 13, color: isToday ? '#4f46e5' : '#475569', borderBottom: '1px solid #e2e8f0', borderLeft: '1px solid #f1f5f9' }}>
+                  <th key={day.toISOString()} style={{ padding: '10px 4px', textAlign: 'center', fontWeight: 600, fontSize: 13, color: isToday ? '#4f46e5' : '#475569', borderBottom: '1px solid #cbd5e1', borderLeft: '1px solid #cbd5e1', borderRight: '1px solid #cbd5e1' }}>
                     <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 0.5, fontWeight: 500, marginBottom: 2, color: isToday ? '#4f46e5' : '#94a3b8' }}>
                       {format(day, 'EEE', { locale: ru })}
                     </div>
@@ -264,7 +264,8 @@ export default function WeeklyCalendar() {
                     fontWeight: 500,
                     verticalAlign: 'top',
                     paddingTop: 6,
-                    borderTop: '1px solid #f1f5f9',
+                    borderTop: '1px solid #cbd5e1',
+                    borderRight: '1px solid #cbd5e1',
                     whiteSpace: 'nowrap',
                     width: 56,
                   }}>
@@ -298,8 +299,10 @@ export default function WeeklyCalendar() {
                           style={{
                             background: bg,
                             border,
-                            borderTop: '1px solid #1a2035',
-                            borderLeft: '1px solid #1e2433',
+                            borderTop: '1px solid #cbd5e1',
+                            borderLeft: '1px solid #cbd5e1',
+                            borderRight: '1px solid #cbd5e1',
+                            borderBottom: '1px solid #cbd5e1',
                             padding: '6px 8px',
                             verticalAlign: 'top',
                             cursor: slot.deal_id ? 'pointer' : 'default',
@@ -337,8 +340,10 @@ export default function WeeklyCalendar() {
                         onClick={() => openBooking(dayStr, hour)}
                         style={{
                           background: 'transparent',
-                          borderTop: '1px solid #f1f5f9',
-                          borderLeft: '1px solid #f1f5f9',
+                          borderTop: '1px solid #cbd5e1',
+                          borderLeft: '1px solid #cbd5e1',
+                          borderRight: '1px solid #cbd5e1',
+                          borderBottom: '1px solid #cbd5e1',
                           height: 42,
                           cursor: 'pointer',
                           transition: 'background 0.1s',
@@ -353,14 +358,14 @@ export default function WeeklyCalendar() {
             })}
             {/* Totals row */}
             <tr>
-              <td style={{ padding: '8px 8px 0 0', textAlign: 'right', fontSize: 10, color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5, borderTop: '2px solid #e2e8f0' }}>
+              <td style={{ padding: '8px 8px 0 0', textAlign: 'right', fontSize: 10, color: '#94a3b8', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5, borderTop: '2px solid #cbd5e1', borderRight: '1px solid #cbd5e1' }}>
                 Итого
               </td>
               {days.map(day => {
                 const dayStr = format(day, 'yyyy-MM-dd')
                 const total = dayTotal(dayStr)
                 return (
-                  <td key={dayStr} style={{ padding: '8px 8px 0', textAlign: 'center', fontSize: 12, fontWeight: 700, color: total > 0 ? '#16a34a' : '#cbd5e1', borderTop: '2px solid #e2e8f0', borderLeft: '1px solid #f1f5f9' }}>
+                  <td key={dayStr} style={{ padding: '8px 8px 0', textAlign: 'center', fontSize: 12, fontWeight: 700, color: total > 0 ? '#16a34a' : '#cbd5e1', borderTop: '2px solid #cbd5e1', borderLeft: '1px solid #cbd5e1', borderRight: '1px solid #cbd5e1', borderBottom: '1px solid #cbd5e1' }}>
                     {total > 0 ? `${total.toLocaleString('ru')} ₽` : '—'}
                   </td>
                 )

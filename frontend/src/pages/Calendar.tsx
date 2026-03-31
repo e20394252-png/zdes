@@ -13,6 +13,7 @@ type Slot = {
   deal_id: number | null
   deal_title: string | null
   is_confirmed: boolean
+  contact_name: string | null
 }
 
 type Hall = { id: number; name: string }
@@ -291,7 +292,7 @@ export default function Calendar() {
                               className={`px-2 py-0.5 rounded text-xs font-medium ${isDeal ? 'cursor-pointer hover:opacity-80' : ''}`} 
                               style={{ backgroundColor: c + '15', color: c, borderLeft: `2px solid ${c}` }}
                             >
-                              {s.hall_name}: {s.deal_title || 'Бронь'}
+                              {s.hall_name}: {s.contact_name ? `${s.contact_name} ` : ''}{s.deal_title ? `(${s.deal_title})` : ''}
                             </span>
                           )
                         })}
