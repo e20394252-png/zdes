@@ -9,4 +9,4 @@ class BotBookingRequest(BaseModel):
     event_date: date = Field(..., description="Дата мероприятия YYYY-MM-DD")
     event_time_start: time = Field(..., description="Время начала HH:MM")
     event_time_end: time = Field(..., description="Время конца HH:MM")
-    comments: Optional[str] = Field(None, description="Дополнительные пожелания/комментарии")
+    event: Optional[str] = Field(None, description="Название события/мероприятия")

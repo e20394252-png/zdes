@@ -87,7 +87,7 @@ async def create_booking_from_bot(
 
     # 4. Создать Сделку (Бронирование)
     # Формируем красивое название сделки
-    deal_title = f"[Бот] Мероприятие {data.event_date.strftime('%d.%m.%Y')} {data.event_time_start.strftime('%H:%M')}"
+    deal_title = data.event if data.event else f"[Бот] Мероприятие {data.event_date.strftime('%d.%m.%Y')} {data.event_time_start.strftime('%H:%M')}"
     
     deal = Deal(
         title=deal_title,
@@ -99,7 +99,7 @@ async def create_booking_from_bot(
         event_date=data.event_date,
         event_time_start=data.event_time_start,
         event_time_end=data.event_time_end,
-        comments=data.comments,
+        comments=None,
         source="telegram_bot"
     )
     
