@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { contacts as contactsApi } from '../api/client'
+import { Trash2 } from 'lucide-react'
 
 type Contact = {
   id: number
@@ -56,6 +57,18 @@ export default function Contacts() {
       alert(err.message || 'Ошибка при сохранении контакта')
     } finally {
       setSaving(false)
+    }
+  }
+
+  const handleDelete = async (id: number, e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (window.confirm('Вы уверены, что хотите удалить этот контакт? Это действие необратимо.')) {
+      try {
+        await contactsApi.delete(id)
+        load()
+      } catch (err: any) {
+        alert(err.message || 'Ошибка при удалении контакта')
+      }
     }
   }
 
@@ -147,6 +160,7 @@ export default function Contacts() {
                   <th className="text-left py-3 px-4 font-medium text-slate-700">Telegram</th>
                   <th className="text-right py-3 px-4 font-medium text-slate-700">Мероприятий</th>
                   <th className="text-right py-3 px-4 font-medium text-slate-700">Сумма</th>
+                  <th className="w-12 py-3 px-4"></th>
                 </tr>
               </thead>
               <tbody>
@@ -165,6 +179,15 @@ export default function Contacts() {
                     <td className="py-3 px-4 text-right text-slate-700">{c.total_events_count}</td>
                     <td className="py-3 px-4 text-right font-medium text-slate-800">
                       {Number(c.total_amount).toLocaleString('ru-RU')} ₽
+                    </td>
+                    <td className="py-3 px-4 text-center">
+                      <button 
+                        onClick={(e) => handleDelete(c.id, e)}
+                        className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors flex items-center justify-center shrink-0"
+                        title="Удалить контакт"
+                      >
+                        <Trash2 size={18} />
+                      </button>
                     </td>
                   </tr>
                 ))}
