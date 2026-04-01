@@ -81,6 +81,9 @@ class Settings(BaseSettings):
     # OpenAI for message parsing (optional)
     OPENAI_API_KEY: str = ""
 
+    # Webhook
+    BOT_WEBHOOK_SECRET: str = "sk_live_bot_v1_change_me"
+
 
 @lru_cache
 def get_settings() -> Settings:
