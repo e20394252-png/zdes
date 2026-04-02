@@ -100,15 +100,29 @@ export const tasks = {
   delete: (id: number) => api.delete(`/tasks/${id}`).then(res => res.data),
 }
 
+const slotsCache = new Map<string, { time: number; data: any }>()
+const CACHE_TTL = 5 * 60 * 1000 // 5 minutes
+
 export const calendar = {
-  slots: (from_date: string, to_date: string, hall_id?: number | 'all') =>
-    api.get('/calendar/slots', { 
+  slots: (from_date: string, to_date: string, hall_id?: number | 'all', forceRefresh: boolean = false) => {
+    const key = `${from_date}_${to_date}_${hall_id}`
+    if (!forceRefresh) {
+      const cached = slotsCache.get(key)
+      if (cached && Date.now() - cached.time < CACHE_TTL) {
+        return Promise.resolve(cached.data)
+      }
+    }
+    return api.get('/calendar/slots', { 
       params: { 
         from_date, 
         to_date, 
         hall_id: hall_id === 'all' ? undefined : hall_id 
       } 
-    }).then(res => res.data),
+    }).then(res => {
+      slotsCache.set(key, { time: Date.now(), data: res.data })
+      return res.data
+    })
+  },
   availability: (
     hall_id: number,
     event_date: string,

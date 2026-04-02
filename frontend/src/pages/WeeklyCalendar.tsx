@@ -151,7 +151,7 @@ export default function WeeklyCalendar() {
       })
       const from = format(weekStart, 'yyyy-MM-dd')
       const to = format(weekEnd, 'yyyy-MM-dd')
-      calendar.slots(from, to).then(r => setSlots(r.slots || []))
+      calendar.slots(from, to, undefined, true).then(r => setSlots(r.slots || []))
       setShowBooking(false)
     } catch (_) {} finally {
       setSaving(false)

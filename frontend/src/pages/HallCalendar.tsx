@@ -162,8 +162,8 @@ export default function HallCalendar() {
       // Refresh slots
       const from = format(monthStart, 'yyyy-MM-dd')
       const to = format(monthEnd, 'yyyy-MM-dd')
-      const r = await calendar.slots(from, to, hallId)
-      setSlots(r.data.slots || [])
+      const r = await calendar.slots(from, to, hallId, true)
+      setSlots(r.data ? r.data.slots : (r.slots || []))
       if (selectedDay) {
         // keep modal open to see updated schedule
       }

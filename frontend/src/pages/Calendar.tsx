@@ -154,7 +154,7 @@ export default function Calendar() {
       setShowBooking(false)
       const from = format(monthStart, 'yyyy-MM-dd')
       const to = format(monthEnd, 'yyyy-MM-dd')
-      const r = await calendar.slots(from, to, selectedHall ?? undefined)
+      const r = await calendar.slots(from, to, selectedHall ?? undefined, true)
       setSlots(r.slots || [])
     } catch (_) {}
     setSaving(false)
