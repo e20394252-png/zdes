@@ -76,8 +76,14 @@ export const deals = {
     api.get('/deals', { params }).then(res => res.data),
   get: (id: number) => api.get(`/deals/${id}`).then(res => res.data),
   create: (data: object, auto_invoice?: boolean) =>
-    api.post('/deals', data, { params: { auto_invoice } }).then(res => res.data),
-  update: (id: number, data: object) => api.patch(`/deals/${id}`, data).then(res => res.data),
+    api.post('/deals', data, { params: { auto_invoice } }).then(res => {
+      clearCalendarCache()
+      return res.data
+    }),
+  update: (id: number, data: object) => api.patch(`/deals/${id}`, data).then(res => {
+    clearCalendarCache()
+    return res.data
+  }),
   moveStage: (id: number, stage_id: number) =>
     api.patch(`/deals/${id}/stage?stage_id=${stage_id}`).then(res => res.data),
   createInvoice: (id: number) => api.post(`/deals/${id}/invoice`).then(res => res.data),
@@ -100,7 +106,9 @@ export const tasks = {
   delete: (id: number) => api.delete(`/tasks/${id}`).then(res => res.data),
 }
 
-const slotsCache = new Map<string, { time: number; data: any }>()
+export const slotsCache = new Map<string, { time: number; data: any }>()
+export const clearCalendarCache = () => slotsCache.clear()
+
 const CACHE_TTL = 5 * 60 * 1000 // 5 minutes
 
 export const calendar = {

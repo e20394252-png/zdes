@@ -108,14 +108,14 @@ export default function DealCard() {
         comments: form.comments || null,
       }
       if (isNew) {
-        const data = await deals.create(payload)
-        navigate(`/deals/${data.id}`)
+        await deals.create(payload)
+        navigate(-1)
       } else {
         await deals.update(Number(id), {
           ...payload,
           deposit_paid: form.deposit_paid,
         })
-        setDeal((prev) => (prev ? { ...prev, ...form } : null))
+        navigate(-1)
       }
     } catch (_) {}
     setSaving(false)
