@@ -38,7 +38,7 @@ export default function Dashboard() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <h1 className="text-2xl font-semibold text-slate-800">Дашборд</h1>
         <button 
-          onClick={() => navigate(`/halls/${bigHall.id}/calendar`)}
+          onClick={() => navigate('/calendar')}
           className="px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm hover:bg-indigo-700 transition"
         >
           Открыть полный календарь →

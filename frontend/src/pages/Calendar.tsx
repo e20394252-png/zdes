@@ -244,15 +244,6 @@ export default function Calendar() {
         </div>
       </div>
 
-      {/* Legend */}
-      <div className="flex flex-wrap gap-4 text-sm text-slate-600">
-        {halls.map((h) => (
-          <span key={h.id} className="flex items-center gap-1">
-            <span className="inline-block w-3 h-3 rounded" style={{ backgroundColor: getHallColor(h.name) }} />
-            {h.name}
-          </span>
-        ))}
-      </div>
 
       {/* Day Detail Modal */}
       {selectedDay && (
