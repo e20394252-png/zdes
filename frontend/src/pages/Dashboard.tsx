@@ -78,7 +78,11 @@ export default function Dashboard() {
                 const daySlots = data.slots.filter(s => s.date === dayStr && s.hall_id === bigHall.id)
                 
                 return (
-                  <div key={day.toISOString()} className="h-10 bg-slate-50 rounded-lg relative overflow-hidden border border-slate-100 group">
+                  <div 
+                    key={day.toISOString()} 
+                    onClick={() => navigate(`/halls/${bigHall.id}/calendar?date=${dayStr}`)}
+                    className="h-10 bg-slate-50 rounded-lg relative overflow-hidden border border-slate-100 group cursor-pointer hover:ring-2 hover:ring-indigo-300 transition-all"
+                  >
                     {/* Hour markers */}
                     <div className="absolute inset-0 flex justify-between px-1 pointer-events-none opacity-20">
                       {HOURS.filter((_, i) => i % 4 === 0).map(h => (

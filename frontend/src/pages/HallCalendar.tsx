@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, isToday } from 'date-fns'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, isToday, parseISO } from 'date-fns'
 import { ru } from 'date-fns/locale'
 import { calendar, settings, deals, contacts } from '../api/client'
 
@@ -31,6 +31,7 @@ const HALL_COLORS: Record<string, string> = {
 export default function HallCalendar() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const location = useLocation()
   const hallId = Number(id)
 
   const [current, setCurrent] = useState(new Date())
@@ -75,6 +76,20 @@ export default function HallCalendar() {
     const to = format(monthEnd, 'yyyy-MM-dd')
     calendar.slots(from, to, hallId).then((r) => setSlots(r.slots || []))
   }, [current, hallId])
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    const dateParam = params.get('date')
+    if (dateParam) {
+      try {
+        const d = parseISO(dateParam)
+        if (!isNaN(d.getTime())) {
+          setCurrent(d)
+          setSelectedDay(dateParam)
+        }
+      } catch (e) {}
+    }
+  }, [location.search])
 
   useEffect(() => {
     contacts.list({ limit: 500 }).then((r) => setContactsList(r || []))
